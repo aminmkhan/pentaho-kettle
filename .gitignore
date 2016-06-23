@@ -23,3 +23,8 @@ build-res/module-scripts/
 *.ear
 *.iml
 /*.launch
+
+# IntelliJ
+*.ipr
+*.iws
+*-pom.xml
