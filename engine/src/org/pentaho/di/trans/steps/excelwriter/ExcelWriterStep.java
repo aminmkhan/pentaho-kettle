@@ -580,7 +580,7 @@ public class ExcelWriterStep extends BaseStep implements StepInterface {
 
     DataFormat format = data.wb.createDataFormat();
     short formatIndex = format.getFormat( excelFieldFormat );
-    CellStyle style = data.wb.createCellStyle();
+    CellStyle style = cell.getCellStyle();
     style.setDataFormat( formatIndex );
     cell.setCellStyle( style );
   }
