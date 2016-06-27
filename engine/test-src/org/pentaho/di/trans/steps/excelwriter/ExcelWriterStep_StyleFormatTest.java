@@ -40,7 +40,7 @@ import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 import junit.framework.Assert;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Amin Khan
@@ -49,6 +49,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
   private ExcelWriterStep step;
   private ExcelWriterStepData data;
+  private ExcelWriterStepMeta meta;
   private static StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> helper;
 
   @BeforeClass
@@ -80,18 +81,20 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void generate_Hssf() throws Exception {
-    ExcelWriterStepMeta meta = createStepMeta( "style-template.xls" );
+    createStepMeta( "style-template.xls" );
+    createStep();
 
     data.wb = new HSSFWorkbook();
     data.wb.createSheet( "sheet1" );
     data.wb.createSheet( "sheet2" );
-    assertTrue(1 == 12);
+    // assertTrue(1 == 12);
     System.out.println("Hello!");
   }
 
   @Test
   public void generate_Xssf() throws Exception {
-    ExcelWriterStepMeta meta = createStepMeta( "style-template.xlsx" );
+    createStepMeta( "style-template.xlsx" );
+    createStep();
 
     data.wb = new XSSFWorkbook();
     data.wb.createSheet( "sheet1" );
@@ -100,15 +103,22 @@ public class ExcelWriterStep_StyleFormatTest {
 
   }
 
-  public ExcelWriterStepMeta createStepMeta(String fileName) throws IOException {
+  private void createStepMeta(String templateFileName) throws IOException {
     File tempFile = File.createTempFile( "PDI_excel_tmp", ".tmp" );
     tempFile.deleteOnExit();
 
     final ExcelWriterStepMeta meta = new ExcelWriterStepMeta();
     meta.setFileName( tempFile.getAbsolutePath() );
     meta.setTemplateEnabled( true );
-    meta.setTemplateFileName( getClass().getResource( "style-template.xls" ).getFile() );
+    meta.setTemplateFileName( getClass().getResource( templateFileName ).getFile() );
+  }
 
-    return meta;
+  private void createStep() throws Exception {
+    step =
+            new ExcelWriterStep( helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
+    step.init( meta, helper.initStepDataInterface );
+    Assert.assertEquals( "Step init error.", 0, step.getErrors() );
+    step.dispose( meta, helper.initStepDataInterface );
+    Assert.assertEquals( "Step dispose error", 0, step.getErrors() );
   }
 }
