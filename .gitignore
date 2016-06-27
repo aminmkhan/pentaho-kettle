@@ -21,10 +21,11 @@ build-res/module-scripts/
 *.jar
 *.war
 *.ear
-*.iml
-/*.launch
+/**/*.iml
+/**/*.launch
 
 # IntelliJ
-*.ipr
-*.iws
-*-pom.xml
+/**/*.ipr
+/**/*.iws
+/**/*-pom.xml
+/**/*.db
