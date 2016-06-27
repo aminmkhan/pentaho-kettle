@@ -22,8 +22,10 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -36,8 +38,9 @@ import org.pentaho.di.trans.steps.StepMockUtil;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import junit.framework.Assert;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Amin Khan
@@ -77,17 +80,35 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void generate_Hssf() throws Exception {
+    ExcelWriterStepMeta meta = createStepMeta( "style-template.xls" );
+
     data.wb = new HSSFWorkbook();
     data.wb.createSheet( "sheet1" );
     data.wb.createSheet( "sheet2" );
-
+    assertTrue(1 == 12);
+    System.out.println("Hello!");
   }
 
   @Test
   public void generate_Xssf() throws Exception {
+    ExcelWriterStepMeta meta = createStepMeta( "style-template.xlsx" );
+
     data.wb = new XSSFWorkbook();
     data.wb.createSheet( "sheet1" );
     data.wb.createSheet( "sheet2" );
+    Assert.fail();
 
+  }
+
+  public ExcelWriterStepMeta createStepMeta(String fileName) throws IOException {
+    File tempFile = File.createTempFile( "PDI_excel_tmp", ".tmp" );
+    tempFile.deleteOnExit();
+
+    final ExcelWriterStepMeta meta = new ExcelWriterStepMeta();
+    meta.setFileName( tempFile.getAbsolutePath() );
+    meta.setTemplateEnabled( true );
+    meta.setTemplateFileName( getClass().getResource( "style-template.xls" ).getFile() );
+
+    return meta;
   }
 }
