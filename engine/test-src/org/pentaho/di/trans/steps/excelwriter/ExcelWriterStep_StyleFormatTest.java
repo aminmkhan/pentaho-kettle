@@ -27,14 +27,13 @@ import java.io.IOException;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
-import org.pentaho.di.trans.step.StepDataInterface;
-import org.pentaho.di.trans.steps.StepMockUtil;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 
@@ -56,8 +55,8 @@ public class ExcelWriterStep_StyleFormatTest {
   public static void setUpEnv() throws KettleException {
     KettleEnvironment.init();
     helper =
-        new StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData>( "ExcelWriterStep_StyleFormatTest", ExcelWriterStepMeta.class,
-                ExcelWriterStepData.class );
+        new StepMockHelper<>( "ExcelWriterStep_StyleFormatTest",
+                ExcelWriterStepMeta.class, ExcelWriterStepData.class );
     when( helper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
             helper.logChannelInterface );
     when( helper.trans.isRunning() ).thenReturn( true );
@@ -65,24 +64,22 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Before
   public void setUp() throws Exception {
-    StepMockHelper<ExcelWriterStepMeta, StepDataInterface> mockHelper =
-            StepMockUtil.getStepMockHelper( ExcelWriterStepMeta.class, "ExcelWriterStep_StyleFormatTest" );
-
     step = new ExcelWriterStep(
-            mockHelper.stepMeta, mockHelper.stepDataInterface, 0, mockHelper.transMeta, mockHelper.trans );
+            helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
+
     step = spy( step );
     // ignoring to avoid useless errors in log
     doNothing().when( step ).prepareNextOutputFile();
 
     data = new ExcelWriterStepData();
 
-    step.init( mockHelper.initStepMetaInterface, data );
+    step.init( helper.initStepMetaInterface, data );
+    Assert.assertEquals( "Step init error.", 0, step.getErrors() );
   }
 
   @Test
   public void generate_Hssf() throws Exception {
-    createStepMeta( "style-template.xls" );
-    createStep();
+    setupMeta( "style-template.xls" );
 
     data.wb = new HSSFWorkbook();
     data.wb.createSheet( "sheet1" );
@@ -93,8 +90,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void generate_Xssf() throws Exception {
-    createStepMeta( "style-template.xlsx" );
-    createStep();
+    setupMeta( "style-template.xlsx" );
 
     data.wb = new XSSFWorkbook();
     data.wb.createSheet( "sheet1" );
@@ -103,22 +99,18 @@ public class ExcelWriterStep_StyleFormatTest {
 
   }
 
-  private void createStepMeta(String templateFileName) throws IOException {
+  @After
+  public void terminate() throws Exception {
+    step.dispose( meta, helper.initStepDataInterface );
+    Assert.assertEquals( "Step dispose error", 0, step.getErrors() );
+  }
+
+  private void setupMeta(String templateFileName) throws IOException {
     File tempFile = File.createTempFile( "PDI_excel_tmp", ".tmp" );
     tempFile.deleteOnExit();
 
-    meta = new ExcelWriterStepMeta();
-    meta.setFileName( tempFile.getAbsolutePath() );
-    meta.setTemplateEnabled( true );
-    meta.setTemplateFileName( getClass().getResource( templateFileName ).getFile() );
-  }
-
-  private void createStep() throws Exception {
-    step =
-            new ExcelWriterStep( helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
-    step.init( meta, helper.initStepDataInterface );
-    Assert.assertEquals( "Step init error.", 0, step.getErrors() );
-    step.dispose( meta, helper.initStepDataInterface );
-    Assert.assertEquals( "Step dispose error", 0, step.getErrors() );
+    helper.stepMeta.setFileName( tempFile.getAbsolutePath() );
+    helper.setTemplateEnabled( true );
+    helper.setTemplateFileName( getClass().getResource( templateFileName ).getFile() );
   }
 }
