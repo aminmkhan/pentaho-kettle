@@ -1,4 +1,4 @@
-ƒ<project name="Kettle" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="Kettle" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <description>
     Kettle build file
@@ -36,7 +36,7 @@
   <property file="build.properties"/>
 
   <!--Import Open Assembly ant file -->
-  <import file="build-res/subfloor.xml"/>
+  <import file="build-res/subfloor_custom_amin.xml"/>
 
 
   <!-- - - - - - - - - - - - - - - - - -
@@ -571,7 +571,7 @@
        ==========================
   -->
 
-  <target name="compile-integration-tests" description="compile the tests" depends="tests-stage">
+  <target name="compile-integration-tests" description="compile the tests" depends="init, init-tests, tests-stage-init">
     <echo>Compiling Kettle tests...</echo>
     <javac fork="true"
            srcdir="${test}"
