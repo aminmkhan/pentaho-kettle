@@ -6,9 +6,9 @@
         <entry key="active-configuration" value="LOCAL_FILE:/Users/nbaker/IdeaProjects/Platform/pentaho-coding-standards/pentaho_checkStyle.xml:Pentaho Checks" />
         <entry key="check-nonjava-files" value="false" />
         <entry key="check-test-classes" value="false" />
-        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules" />
-        <entry key="location-1" value="LOCAL_FILE:/Users/nbaker/IdeaProjects/Platform/pentaho-coding-standards/pentaho_checkStyle.xml:Pentaho Checks" />
-        <entry key="property-1.samedir" value="" />
+        <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default Checkstyle rules" />
+        <entry key="location-1" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules" />
+        <entry key="location-2" value="LOCAL_FILE:/Users/nbaker/IdeaProjects/Platform/pentaho-coding-standards/pentaho_checkStyle.xml:Pentaho Checks" />
         <entry key="suppress-errors" value="false" />
         <entry key="thirdparty-classpath" value="" />
       </map>
@@ -194,17 +194,15 @@
       <module fileurl="file://$PROJECT_DIR$/engine/Kettle Engine.iml" filepath="$PROJECT_DIR$/engine/Kettle Engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/kettle-gpload-plugin/Kettle GPLoad Plugin.iml" filepath="$PROJECT_DIR$/plugins/kettle-gpload-plugin/Kettle GPLoad Plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/kettle-hl7-plugin/Kettle HL7 Plugin.iml" filepath="$PROJECT_DIR$/plugins/kettle-hl7-plugin/Kettle HL7 Plugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/jdbc/Kettle JDBC.iml" filepath="$PROJECT_DIR$/jdbc/Kettle JDBC.iml" />
-      <module fileurl="file://$PROJECT_DIR$/plugins/market/Kettle Market Plugin.iml" filepath="$PROJECT_DIR$/plugins/market/Kettle Market Plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/kettle-openerp-plugin/Kettle Open ERP Plugin.iml" filepath="$PROJECT_DIR$/plugins/kettle-openerp-plugin/Kettle Open ERP Plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/kettle-palo-plugin/Kettle Palo Plugin.iml" filepath="$PROJECT_DIR$/plugins/kettle-palo-plugin/Kettle Palo Plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugins/star-modeler/Kettle Star Modeler Plugin.iml" filepath="$PROJECT_DIR$/plugins/star-modeler/Kettle Star Modeler Plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/ui/Kettle UI.iml" filepath="$PROJECT_DIR$/ui/Kettle UI.iml" />
-      <module fileurl="file://$PROJECT_DIR$/plugins/kettle5-log4j-plugin/PDI5 Log4j logging plugin.iml" filepath="$PROJECT_DIR$/plugins/kettle5-log4j-plugin/PDI5 Log4j logging plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/pentaho-kettle.iml" filepath="$PROJECT_DIR$/pentaho-kettle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/test/test.iml" filepath="$PROJECT_DIR$/test/test.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" assert-keyword="true" jdk-15="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">

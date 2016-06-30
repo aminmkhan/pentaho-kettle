@@ -30,3 +30,4 @@ build-res/module-scripts/
 /**/*.iws
 /**/*-pom.xml
 /**/*.db
+kettle.ipr
