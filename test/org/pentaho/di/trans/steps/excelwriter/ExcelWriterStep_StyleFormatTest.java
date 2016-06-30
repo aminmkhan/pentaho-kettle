@@ -109,8 +109,5 @@ public class ExcelWriterStep_StyleFormatTest {
     File tempFile = File.createTempFile( "PDI_excel_tmp", ".tmp" );
     tempFile.deleteOnExit();
 
-    helper.stepMeta.setFileName( tempFile.getAbsolutePath() );
-    helper.setTemplateEnabled( true );
-    helper.setTemplateFileName( getClass().getResource( templateFileName ).getFile() );
   }
 }
