@@ -22,59 +22,52 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.pentaho.di.core.KettleEnvironment;
+import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.logging.LoggingObjectInterface;
-import org.pentaho.di.trans.steps.mock.StepMockHelper;
-
-
-import junit.framework.Assert;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import org.pentaho.di.core.row.RowMeta;
+import org.pentaho.di.core.row.ValueMetaInterface;
+import org.pentaho.di.core.row.value.ValueMetaString;
+import org.pentaho.di.trans.TransHopMeta;
+import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.trans.TransTestFactory;
+import org.pentaho.di.trans.steps.excelinput.ExcelInputField;
+import org.pentaho.di.trans.steps.excelinput.ExcelInputMeta;
 
 /**
  * @author Amin Khan
  */
 public class ExcelWriterStep_StyleFormatTest {
 
-  private ExcelWriterStep step;
-  private ExcelWriterStepData data;
-  private ExcelWriterStepMeta meta;
-  private static StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> helper;
-
   @BeforeClass
   public static void setUpEnv() throws KettleException {
     KettleEnvironment.init();
-    helper =
-        new StepMockHelper<>( "ExcelWriterStep_StyleFormatTest",
-                ExcelWriterStepMeta.class, ExcelWriterStepData.class );
-    when( helper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
-            helper.logChannelInterface );
-    when( helper.trans.isRunning() ).thenReturn( true );
   }
 
   @Before
   public void setUp() throws Exception {
-    step = new ExcelWriterStep(
-            helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
+    String stepName = "Excel Writer";
+    ExcelWriterStepMeta meta = new ExcelWriterStepMeta();
+    meta.setDefault();
 
-    step = spy( step );
-    // ignoring to avoid useless errors in log
-    doNothing().when( step ).prepareNextOutputFile();
-
-    data = new ExcelWriterStepData();
-
-    step.init( helper.initStepMetaInterface, data );
-    Assert.assertEquals( "Step init error.", 0, step.getErrors() );
+    File tempOutputFile = File.createTempFile( "testPDI11374", ".xlsx" );
+    tempOutputFile.deleteOnExit();
+    meta.setFileName( tempOutputFile.getAbsolutePath().replace( ".xlsx", "" ) );
+    meta.setExtension( "xlsx" );
+    meta.setSheetname( "Sheet10" );
+    meta.setOutputFields( new ExcelWriterStepField[] {} );
+    meta.setHeaderEnabled( true );
   }
 
   @Test
@@ -110,4 +103,19 @@ public class ExcelWriterStep_StyleFormatTest {
     tempFile.deleteOnExit();
 
   }
+
+  private List<RowMetaAndData> getRowMetaAndData() {
+    List<RowMetaAndData> rmd = new ArrayList<RowMetaAndData>();
+    RowMeta rm = new RowMeta();
+    rm.addValueMeta( new ValueMetaString( "col1" ) );
+    rm.addValueMeta( new ValueMetaString( "col2" ) );
+    rm.addValueMeta( new ValueMetaString( "col3" ) );
+    rm.addValueMeta( new ValueMetaString( "col4" ) );
+    rm.addValueMeta( new ValueMetaString( "col5" ) );
+    rm.addValueMeta( new ValueMetaString( "col6" ) );
+    rmd.add( new RowMetaAndData( rm, new Object[] { "1000.010101", "123456.654321", "9999.7777", "121212.4343434", "0", "-1021.32" } ) );
+    rmd.add( new RowMetaAndData( rm, new Object[] { "1000", "-123456.6", "80808.777721", "13.4", "8989898e-10", "123e12" } ) );
+    return rmd;
+  }
+
 }
