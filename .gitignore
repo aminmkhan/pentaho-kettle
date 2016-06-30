@@ -8,6 +8,7 @@ dev-lib/
 cobertura/
 checkstyle/
 eclipse-bin/
+out/
 override.properties
 testdata.log
 testdata.properties
