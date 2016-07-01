@@ -22,13 +22,18 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
-import org.apache.commons.vfs2.FileObject;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Sheet;
+import java.util.ArrayList;
+import java.util.List;
+import java.io.File;
+import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
-import org.pentaho.di.core.row.value.ValueMetaFactory;
+import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.utils.TestUtils;
+import org.pentaho.di.core.RowMetaAndData;
+import org.pentaho.di.core.row.value.ValueMetaFactory;
+import org.pentaho.di.core.row.RowMeta;
+import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.trans.step.StepDataInterface;
@@ -71,17 +76,24 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void test_style_format_Hssf() throws Exception {
-    createStepMeta("xls");
+    createStepMeta( "xls" );
+    createStepData( "xls" );
 
   }
 
   @Test
   public void test_style_format_Xssf() throws Exception {
-    createStepMeta("xlsx");
+    createStepMeta( "xlsx" );
+    createStepData( "xlsx" );
+    List<RowMetaAndData> list = createData();
+
+    // step.writeNextLine( list[0] );
+
+    // Tests
 
   }
 
-  private void createStepMeta(String filetype) throws Exception {
+  private void createStepMeta( String filetype ) throws KettleException, IOException {
     // TODO Try to load the template file present for ExcelOutput step
     String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
     templateFilePath = "chart-template.xls";
@@ -103,15 +115,32 @@ public class ExcelWriterStep_StyleFormatTest {
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
     outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
-    outputFields[0].setStyleCell("B3");
+    outputFields[0].setStyleCell( "B3" );
     outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0" );
-    outputFields[1].setStyleCell("B2");
+    outputFields[1].setStyleCell( "B2" );
     outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
-    outputFields[2].setStyleCell("");
+    outputFields[2].setStyleCell( "" );
     outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
-    outputFields[3].setStyleCell("B2");
+    outputFields[3].setStyleCell( "B2" );
 
     meta.setOutputFields( outputFields );
 
   }
+
+  private void createStepData( String filetype ) throws KettleException {
+    data.posX = 0;
+    data.posY = 0;
+
+    data.wb = null;
+    data.sheet = null;
+
+    data.inputRowMeta = null;
+  }
+
+  private List<RowMetaAndData> createData() throws KettleException {
+    List<RowMetaAndData> list = new ArrayList<RowMetaAndData>();
+
+    return list;
+  }
+
 }
