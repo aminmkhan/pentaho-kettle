@@ -27,6 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.Before;
 import org.junit.Test;
+import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
@@ -88,13 +89,25 @@ public class ExcelWriterStep_StyleFormatTest {
 
     meta.setFileName( path.replace( "." + filetype, "" ) );
     meta.setExtension( filetype );
-    meta.setOutputFields( new ExcelWriterStepField[] {} );
+    meta.setSheetname( "Sheet101" );
     meta.setHeaderEnabled( true );
     meta.setStartingCell( "B3" );
 
     meta.setTemplateEnabled( true );
-    meta.setTemplateFileName( getClass().getResource( "../exceloutput/chart-template.xls" ).getFile() );
+//    meta.setTemplateFileName( getClass().getResource( "../exceloutput/chart-template.xls" ).getFile() );
     meta.setTemplateSheetName( "SheetAsWell" );
+
+    ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
+    outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
+    outputFields[0].setStyleCell("B3");
+    outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0" );
+    outputFields[1].setStyleCell("B2");
+    outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
+    outputFields[2].setStyleCell("");
+    outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
+    outputFields[3].setStyleCell("B2");
+
+    meta.setOutputFields( outputFields );
 
   }
 }
