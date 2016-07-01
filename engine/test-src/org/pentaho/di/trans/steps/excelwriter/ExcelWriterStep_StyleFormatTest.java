@@ -22,9 +22,6 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -72,19 +69,18 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   @Test
-  public void test_style_format_Hssf() throws KettleException, IOException, Exception {
+  public void test_style_format_Hssf() throws Exception {
     createStepMeta("xls");
 
   }
 
   @Test
-  public void test_style_format_Xssf() throws KettleException, IOException, Exception {
+  public void test_style_format_Xssf() throws Exception {
     createStepMeta("xlsx");
 
   }
 
   private void createStepMeta(String filetype) throws Exception {
-    meta = new ExcelWriterStepMeta();
     meta.setDefault();
 
     String path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + filetype );
