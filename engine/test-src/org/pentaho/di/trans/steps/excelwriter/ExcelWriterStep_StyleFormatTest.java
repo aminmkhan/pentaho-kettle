@@ -82,8 +82,12 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   private void createStepMeta(String filetype) throws Exception {
+    // TODO Try to load the template file present for ExcelOutput step
+    String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
+    templateFilePath = "chart-template.xls";
     meta.setDefault();
 
+    // TODO Avoid even creating file in RAM
     String path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + filetype );
     FileObject xlsFile = TestUtils.getFileObject( path );
 
@@ -94,7 +98,7 @@ public class ExcelWriterStep_StyleFormatTest {
     meta.setStartingCell( "B3" );
 
     meta.setTemplateEnabled( true );
-//    meta.setTemplateFileName( getClass().getResource( "../exceloutput/chart-template.xls" ).getFile() );
+    meta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
     meta.setTemplateSheetName( "SheetAsWell" );
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
