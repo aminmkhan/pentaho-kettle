@@ -50,7 +50,7 @@ import org.pentaho.di.trans.steps.excelinput.SpreadSheetType;
 /**
  * @author Amin Khan
  */
-public class ExcelWriterStep_StyleFormatTest {
+public class ExcelWriterStep_StyleFormat_IntegrationTest {
 
   private ExcelWriterStep step;
   private ExcelWriterStepMeta meta;
