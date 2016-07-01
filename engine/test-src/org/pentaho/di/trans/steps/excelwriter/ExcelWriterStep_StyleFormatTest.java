@@ -90,5 +90,11 @@ public class ExcelWriterStep_StyleFormatTest {
     meta.setExtension( filetype );
     meta.setOutputFields( new ExcelWriterStepField[] {} );
     meta.setHeaderEnabled( true );
+    meta.setStartingCell( "B3" );
+
+    meta.setTemplateEnabled( true );
+    meta.setTemplateFileName( getClass().getResource( "../exceloutput/chart-template.xls" ).getFile() );
+    meta.setTemplateSheetName( "SheetAsWell" );
+
   }
 }
