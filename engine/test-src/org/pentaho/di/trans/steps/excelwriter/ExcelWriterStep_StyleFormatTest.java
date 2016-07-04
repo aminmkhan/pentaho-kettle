@@ -109,22 +109,20 @@ public class ExcelWriterStep_StyleFormatTest {
     when( rowSet.getRowMeta() ).thenReturn( inputRowMeta );
     when( inputRowMeta.clone() ).thenReturn( inputRowMeta );
 
+    stepMeta = new ExcelWriterStepMeta();
+    createStepMeta( FILE_TYPE );
+    stepData = new ExcelWriterStepData();
+    createStepData( FILE_TYPE );
+
+    step.getInputRowSets().add( rowSet );
+    step.getOutputRowSets().add( rowSet );
+
+    step.init( stepMeta, stepData );
 
     // TODO Do we need spy? Or do nothing when next output file?
     // step = spy( step );
     // // ignoring to avoid useless errors in log
     // doNothing().when( step ).prepareNextOutputFile();
-
-
-
-    stepMeta = new ExcelWriterStepMeta();
-    stepData = new ExcelWriterStepData();
-
-    step.getInputRowSets().add( rowSet );
-    step.getOutputRowSets().add( rowSet );
-
-    // TODO Do we need to initialize step?
-    step.init( stepMockHelper.initStepMetaInterface, stepData );
   }
 
   @After
@@ -212,14 +210,19 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.posX = stepData.startingCol;
     stepData.posY = stepData.startingRow ;
 
-    stepData.outputRowMeta = new RowMeta();
-    stepData.inputRowMeta = new RowMeta();
+    // TODO Fix: Output row meta is not set for step data
+    stepData.inputRowMeta = step.getInputRowMeta();
+    stepData.outputRowMeta = step.getInputRowMeta();
     stepData.firstFileOpened = true;
 
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
 
-    stepData.inputRowMeta = null;
+    // remember where the output fields are in the input row
+    stepData.fieldnrs = new int[stepMeta.getOutputFields().length];
+    for ( int i = 0; i < stepMeta.getOutputFields().length; i++ ) {
+      stepData.fieldnrs[i] = i;
+    }
   }
 
   private ArrayList<Object[]> createData() throws Exception {
