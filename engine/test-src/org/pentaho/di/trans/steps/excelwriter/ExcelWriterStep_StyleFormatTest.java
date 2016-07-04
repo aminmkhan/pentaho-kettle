@@ -24,9 +24,6 @@ package org.pentaho.di.trans.steps.excelwriter;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.core.RowSet;
 import org.pentaho.di.utils.TestUtils;
@@ -39,6 +36,12 @@ import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 import java.io.OutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -63,6 +66,7 @@ public class ExcelWriterStep_StyleFormatTest {
   private ExcelWriterStepData stepData;
 
   private String path;
+  private List<Object[]> rows = new ArrayList<Object[]>();
 
   @Before
   public void setUp() throws Exception {
@@ -91,17 +95,33 @@ public class ExcelWriterStep_StyleFormatTest {
     when( mockInputRowMeta.clone() ).thenReturn( mockOutputRowMeta );
     when( mockInputRowMeta.isNull( any( Object[].class ), anyInt() ) ).thenReturn( true );
 
+    step =
+      new ExcelWriterStep(
+        stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
+
+    rows = createData();
+    RowSet rowSet = stepMockHelper.getMockInputRowSet( rows );
+    RowMetaInterface inputRowMeta = mock( RowMetaInterface.class );
+    step.setInputRowMeta( inputRowMeta );
+
+    when( rowSet.getRowWait( anyInt(), anyObject() ) ).thenReturn( rows.isEmpty() ? null : rows.iterator()
+        .next() );
+    when( rowSet.getRowMeta() ).thenReturn( inputRowMeta );
+    when( inputRowMeta.clone() ).thenReturn( inputRowMeta );
+
+
     // TODO Do we need spy? Or do nothing when next output file?
     // step = spy( step );
     // // ignoring to avoid useless errors in log
     // doNothing().when( step ).prepareNextOutputFile();
 
-    step =
-      new ExcelWriterStep(
-        stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
+
 
     stepMeta = new ExcelWriterStepMeta();
     stepData = new ExcelWriterStepData();
+
+    step.getInputRowSets().add( rowSet );
+    step.getOutputRowSets().add( rowSet );
 
     // TODO Do we need to initialize step?
     step.init( stepMockHelper.initStepMetaInterface, stepData );
@@ -120,8 +140,8 @@ public class ExcelWriterStep_StyleFormatTest {
     step.init( stepMeta, stepData );
 
     // step.prepareNextOutputFile();
-    Object[] row = createData();
-    step.writeNextLine( row );
+    rows = createData();
+    step.writeNextLine( rows.toArray() );
 
     // TODO Some redundant tests just to verify it is working
     step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
@@ -202,9 +222,12 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.inputRowMeta = null;
   }
 
-  private Object[] createData() throws Exception {
+  private ArrayList<Object[]> createData() throws Exception {
     Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
-    return row;
+    ArrayList<Object[]> rows = new ArrayList<Object[]>();
+    rows.add(row);
+    rows.add(row);
+    return rows;
   }
 
   private HSSFWorkbook createWorkbook( FileObject file ) throws Exception {
