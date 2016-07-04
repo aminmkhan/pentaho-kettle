@@ -210,9 +210,9 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.posX = stepData.startingCol;
     stepData.posY = stepData.startingRow ;
 
-    // TODO Fix: Output row meta is not set for step data
-    stepData.inputRowMeta = step.getInputRowMeta();
-    stepData.outputRowMeta = step.getInputRowMeta();
+    // TODO Fix: Output row meta is not set for step data, should have ValueMetaList containing ValueMetaBase
+    stepData.inputRowMeta = step.getInputRowMeta().clone();
+    stepData.outputRowMeta = step.getInputRowMeta().clone();
     stepData.firstFileOpened = true;
 
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
