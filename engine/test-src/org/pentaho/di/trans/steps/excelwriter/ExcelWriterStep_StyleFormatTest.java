@@ -75,16 +75,33 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   @Test
-  public void test_style_format_Hssf() throws Exception {
+  public void testStyleFormatHssf() throws Exception {
     createStepMeta( "xls" );
     createStepData( "xls" );
 
   }
 
   @Test
-  public void test_style_format_Xssf() throws Exception {
+  public void testStyleFormatXssf() throws Exception {
     createStepMeta( "xlsx" );
     createStepData( "xlsx" );
+    List<RowMetaAndData> list = createData();
+
+    // step.writeNextLine( list[0] );
+
+    // Tests
+
+  }
+
+  @Test
+  public void testStyleFormatNoTemplate() throws Exception {
+    createStepMeta( "xlsx" );
+    createStepData( "xlsx" );
+
+    meta.setTemplateEnabled( false );
+    meta.setTemplateFileName( "" );
+
+
     List<RowMetaAndData> list = createData();
 
     // step.writeNextLine( list[0] );
