@@ -30,16 +30,18 @@ import java.io.IOException;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.utils.TestUtils;
+import org.pentaho.di.core.KettleEnvironment;
+import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.steps.StepMockUtil;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
@@ -57,6 +59,11 @@ public class ExcelWriterStep_StyleFormatTest {
   private ExcelWriterStepData data;
   private ExcelWriterStepMeta meta;
   private static StepMockHelper<ExcelWriterStepMeta, StepDataInterface> helper;
+
+  @BeforeClass
+  public static void setUpEnv() throws KettleException {
+    KettleEnvironment.init( false );
+  }
 
   @Before
   public void setUp() throws Exception {
