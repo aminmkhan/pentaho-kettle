@@ -34,6 +34,9 @@ import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
+import org.pentaho.di.trans.Trans;
+import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.exception.KettleException;
@@ -62,26 +65,30 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @BeforeClass
   public static void setUpEnv() throws KettleException {
-    KettleEnvironment.init( false );
+//    KettleEnvironment.init( false );
   }
 
   @Before
   public void setUp() throws Exception {
-    helper =
-            StepMockUtil.getStepMockHelper( ExcelWriterStepMeta.class, "ExcelWriterStep_StyleFormatTest" );
-    when( helper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
-            helper.logChannelInterface );
-    when( helper.trans.isRunning() ).thenReturn( true );
+//    helper =
+//            StepMockUtil.getStepMockHelper( ExcelWriterStepMeta.class, "ExcelWriterStep_StyleFormatTest" );
+//    when( helper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
+//            helper.logChannelInterface );
+//    when( helper.trans.isRunning() ).thenReturn( true );
+//
+//    step = new ExcelWriterStep(
+//            helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
+//    step = spy( step );
+//    // ignoring to avoid useless errors in log
+//    doNothing().when( step ).prepareNextOutputFile();
 
-    step = new ExcelWriterStep(
-            helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
-    step = spy( step );
-    // ignoring to avoid useless errors in log
-    doNothing().when( step ).prepareNextOutputFile();
-
-    data = new ExcelWriterStepData();
     meta = new ExcelWriterStepMeta();
-    step.init( helper.initStepMetaInterface, data );
+    meta.setDefault();
+    createStepMeta( "xlsx" );
+    data = new ExcelWriterStepData();
+
+    step = new ExcelWriterStep( new StepMeta(), data, 0, new TransMeta(), new Trans() );
+    step.init( meta, data );
   }
 
   @Test
