@@ -22,35 +22,32 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.BeforeClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
-import org.pentaho.di.trans.Trans;
-import org.pentaho.di.trans.TransMeta;
-import org.pentaho.di.trans.step.StepMeta;
 import org.pentaho.di.utils.TestUtils;
-import org.pentaho.di.core.KettleEnvironment;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.row.RowMeta;
-import org.pentaho.di.core.row.RowMetaInterface;
-import org.pentaho.di.trans.step.StepDataInterface;
 import org.pentaho.di.trans.steps.StepMockUtil;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
+
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -58,37 +55,45 @@ import static org.mockito.Mockito.*;
  */
 public class ExcelWriterStep_StyleFormatTest {
 
-  private ExcelWriterStep step;
-  private ExcelWriterStepData data;
-  private ExcelWriterStepMeta meta;
-  private static StepMockHelper<ExcelWriterStepMeta, StepDataInterface> helper;
+  private static final String SHEET_NAME = "Sheet1";
+  private static final String FILE_TYPE = "xls";
 
-  @BeforeClass
-  public static void setUpEnv() throws KettleException {
-//    KettleEnvironment.init( false );
-  }
+  private HSSFWorkbook wb;
+  private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> mockHelper;
+  private ExcelWriterStep step;
+  private ExcelWriterStepMeta stepMeta;
+  private ExcelWriterStepData stepData;
+
+  private String path;
 
   @Before
   public void setUp() throws Exception {
-//    helper =
-//            StepMockUtil.getStepMockHelper( ExcelWriterStepMeta.class, "ExcelWriterStep_StyleFormatTest" );
-//    when( helper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
-//            helper.logChannelInterface );
-//    when( helper.trans.isRunning() ).thenReturn( true );
-//
-//    step = new ExcelWriterStep(
-//            helper.stepMeta, helper.stepDataInterface, 0, helper.transMeta, helper.trans );
-//    step = spy( step );
-//    // ignoring to avoid useless errors in log
-//    doNothing().when( step ).prepareNextOutputFile();
+    // TODO Avoid even creating file in RAM
+    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + FILE_TYPE );
+    FileObject xlsFile = TestUtils.getFileObject( path );
+    wb = createWorkbook( xlsFile );
 
-    meta = new ExcelWriterStepMeta();
-    meta.setDefault();
-    createStepMeta( "xlsx" );
-    data = new ExcelWriterStepData();
+    mockHelper =
+      new StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData>(
+        "Excel Writer Style Format Test", ExcelWriterStepMeta.class, ExcelWriterStepData.class );
+    when( mockHelper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
+        mockHelper.logChannelInterface );
+    step =
+      new ExcelWriterStep(
+        mockHelper.stepMeta, mockHelper.stepDataInterface, 0, mockHelper.transMeta, mockHelper.trans );
 
-    step = new ExcelWriterStep( new StepMeta(), data, 0, new TransMeta(), new Trans() );
-    step.init( meta, data );
+
+
+    // TODO Do we need spy? Or do nothing when next output file?
+    // step = spy( step );
+    // // ignoring to avoid useless errors in log
+    // doNothing().when( step ).prepareNextOutputFile();
+
+    stepMeta = new ExcelWriterStepMeta();
+    stepData = new ExcelWriterStepData();
+
+    // TODO Do we need to initialize step?
+    step.init( mockHelper.initStepMetaInterface, stepData );
   }
 
   @Test
@@ -96,35 +101,31 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepMeta( "xls" );
     createStepData( "xls" );
 
-  }
-
-  @Test
-  public void testStyleFormatXssf() throws Exception {
-    createStepMeta( "xlsx" );
-    createStepData( "xlsx" );
-    step.init( meta, data );
-    List<RowMetaAndData> list = createData();
 
     // step.prepareNextOutputFile();
 
-    Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
-    step.writeNextLine( row );
 
-    // Tests
-    Object v = null;
-    for ( int i = 0; i < 4; i++ ) {
-      v = row[i];
-      System.out.println(v);
-    }
+
+    // TODO Some redundant tests just to verify it is working
+    step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
+    assertTrue( wb.getSheet( SHEET_NAME ).getProtect() );
+
   }
 
-  @Test
+  // @Test
+  public void testStyleFormatXssf() throws Exception {
+    // TODO Test for both xls and xlsx
+    createStepMeta( "xlsx" );
+    createStepData( "xlsx" );
+  }
+
+  // @Test
   public void testStyleFormatNoTemplate() throws Exception {
     createStepMeta( "xlsx" );
     createStepData( "xlsx" );
 
-    meta.setTemplateEnabled( false );
-    meta.setTemplateFileName( "" );
+    stepMeta.setTemplateEnabled( false );
+    stepMeta.setTemplateFileName( "" );
 
     // step.prepareNextOutputFile();
 
@@ -140,21 +141,17 @@ public class ExcelWriterStep_StyleFormatTest {
     // TODO Try to load the template file present for ExcelOutput step
     String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
     templateFilePath = "chart-template.xls";
-    meta.setDefault();
+    stepMeta.setDefault();
 
-    // TODO Avoid even creating file in RAM
-    String path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + fileType );
-    FileObject xlsFile = TestUtils.getFileObject( path );
+    stepMeta.setFileName( path.replace( "." + fileType, "" ) );
+    stepMeta.setExtension( fileType );
+    stepMeta.setSheetname( "Sheet101" );
+    stepMeta.setHeaderEnabled( true );
+    stepMeta.setStartingCell( "B3" );
 
-    meta.setFileName( path.replace( "." + fileType, "" ) );
-    meta.setExtension( fileType );
-    meta.setSheetname( "Sheet101" );
-    meta.setHeaderEnabled( true );
-    meta.setStartingCell( "B3" );
-
-    meta.setTemplateEnabled( true );
-    meta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
-    meta.setTemplateSheetName( "SheetAsWell" );
+    stepMeta.setTemplateEnabled( true );
+    stepMeta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
+    stepMeta.setTemplateSheetName( "SheetAsWell" );
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
     outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
@@ -166,32 +163,46 @@ public class ExcelWriterStep_StyleFormatTest {
     outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
     outputFields[3].setStyleCell( "B2" );
 
-    meta.setOutputFields( outputFields );
+    stepMeta.setOutputFields( outputFields );
 
   }
 
   private void createStepData( String fileType ) throws KettleException {
 
     // start writing from cell B3 in template
-    data.startingRow = 2;
-    data.startingCol = 1;
-    data.posX = data.startingCol;
-    data.posY = data.startingRow ;
+    stepData.startingRow = 2;
+    stepData.startingCol = 1;
+    stepData.posX = stepData.startingCol;
+    stepData.posY = stepData.startingRow ;
 
-    data.outputRowMeta = new RowMeta();
-    data.inputRowMeta = new RowMeta();
-    data.firstFileOpened = true;
+    stepData.outputRowMeta = new RowMeta();
+    stepData.inputRowMeta = new RowMeta();
+    stepData.firstFileOpened = true;
 
-    data.wb = meta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
-    data.sheet = data.wb.createSheet();
+    stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
+    stepData.sheet = stepData.wb.createSheet();
 
-    data.inputRowMeta = null;
+    stepData.inputRowMeta = null;
   }
 
-  private List<RowMetaAndData> createData() throws KettleException {
-    List<RowMetaAndData> list = new ArrayList<RowMetaAndData>();
+  private Object[] createData() throws Exception {
+    Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
+    return row;
+  }
 
-    return list;
+  private HSSFWorkbook createWorkbook( FileObject file ) throws Exception {
+    HSSFWorkbook wb = null;
+    OutputStream os = null;
+    try {
+      os = file.getContent().getOutputStream();
+      wb = new HSSFWorkbook();
+      wb.createSheet( SHEET_NAME );
+      wb.write( os );
+    } finally {
+      os.flush();
+      os.close();
+    }
+    return wb;
   }
 
 }
