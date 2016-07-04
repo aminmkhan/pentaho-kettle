@@ -42,10 +42,10 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 
 /**
@@ -76,7 +76,10 @@ public class ExcelWriterStep_StyleFormatTest {
         "Excel Writer Style Format Test", ExcelWriterStepMeta.class, ExcelWriterStepData.class );
     when( stepMockHelper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
         stepMockHelper.logChannelInterface );
-        when( stepMockHelper.trans.isRunning() ).thenReturn( true );
+    verify( stepMockHelper.logChannelInterface, never() ).logError( anyString() );
+    verify( stepMockHelper.logChannelInterface, never() ).logError( anyString(), any( Object[].class ) );
+    verify( stepMockHelper.logChannelInterface, never() ).logError( anyString(), (Throwable) anyObject() );
+    when( stepMockHelper.trans.isRunning() ).thenReturn( true );
 
     Object[] inputRow = new Object[] {};
     RowSet inputRowSet = stepMockHelper.getMockInputRowSet( inputRow );
