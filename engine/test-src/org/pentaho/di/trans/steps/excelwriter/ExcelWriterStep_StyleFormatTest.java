@@ -26,6 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
@@ -70,7 +74,6 @@ public class ExcelWriterStep_StyleFormatTest {
 
     data = new ExcelWriterStepData();
     meta = new ExcelWriterStepMeta();
-
     step.init( helper.initStepMetaInterface, data );
   }
 
@@ -85,12 +88,20 @@ public class ExcelWriterStep_StyleFormatTest {
   public void testStyleFormatXssf() throws Exception {
     createStepMeta( "xlsx" );
     createStepData( "xlsx" );
+    step.init( meta, data );
     List<RowMetaAndData> list = createData();
 
-    // step.writeNextLine( list[0] );
+    // step.prepareNextOutputFile();
+
+    Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
+    step.writeNextLine( row );
 
     // Tests
-
+    Object v = null;
+    for ( int i = 0; i < 4; i++ ) {
+      v = row[i];
+      System.out.println(v);
+    }
   }
 
   @Test
@@ -101,27 +112,28 @@ public class ExcelWriterStep_StyleFormatTest {
     meta.setTemplateEnabled( false );
     meta.setTemplateFileName( "" );
 
+    // step.prepareNextOutputFile();
 
-    List<RowMetaAndData> list = createData();
+    // List<RowMetaAndData> list = createData();
 
-    // step.writeNextLine( list[0] );
+
 
     // Tests
 
   }
 
-  private void createStepMeta( String filetype ) throws KettleException, IOException {
+  private void createStepMeta( String fileType ) throws KettleException, IOException {
     // TODO Try to load the template file present for ExcelOutput step
     String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
     templateFilePath = "chart-template.xls";
     meta.setDefault();
 
     // TODO Avoid even creating file in RAM
-    String path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + filetype );
+    String path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + fileType );
     FileObject xlsFile = TestUtils.getFileObject( path );
 
-    meta.setFileName( path.replace( "." + filetype, "" ) );
-    meta.setExtension( filetype );
+    meta.setFileName( path.replace( "." + fileType, "" ) );
+    meta.setExtension( fileType );
     meta.setSheetname( "Sheet101" );
     meta.setHeaderEnabled( true );
     meta.setStartingCell( "B3" );
@@ -144,12 +156,20 @@ public class ExcelWriterStep_StyleFormatTest {
 
   }
 
-  private void createStepData( String filetype ) throws KettleException {
-    data.posX = 0;
-    data.posY = 0;
+  private void createStepData( String fileType ) throws KettleException {
 
-    data.wb = null;
-    data.sheet = null;
+    // start writing from cell B3 in template
+    data.startingRow = 2;
+    data.startingCol = 1;
+    data.posX = data.startingCol;
+    data.posY = data.startingRow ;
+
+    data.outputRowMeta = new RowMeta();
+    data.inputRowMeta = new RowMeta();
+    data.firstFileOpened = true;
+
+    data.wb = meta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
+    data.sheet = data.wb.createSheet();
 
     data.inputRowMeta = null;
   }
