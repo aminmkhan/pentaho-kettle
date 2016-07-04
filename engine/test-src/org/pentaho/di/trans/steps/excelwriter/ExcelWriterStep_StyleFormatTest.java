@@ -24,29 +24,27 @@ package org.pentaho.di.trans.steps.excelwriter;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.vfs2.FileObject;
+import org.pentaho.di.core.RowSet;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
-import org.pentaho.di.core.RowMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.row.RowMeta;
-import org.pentaho.di.trans.steps.StepMockUtil;
+import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
-import java.io.PrintStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
@@ -59,7 +57,7 @@ public class ExcelWriterStep_StyleFormatTest {
   private static final String FILE_TYPE = "xls";
 
   private HSSFWorkbook wb;
-  private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> mockHelper;
+  private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
   private ExcelWriterStep step;
   private ExcelWriterStepMeta stepMeta;
   private ExcelWriterStepData stepData;
@@ -73,27 +71,42 @@ public class ExcelWriterStep_StyleFormatTest {
     FileObject xlsFile = TestUtils.getFileObject( path );
     wb = createWorkbook( xlsFile );
 
-    mockHelper =
+    stepMockHelper =
       new StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData>(
         "Excel Writer Style Format Test", ExcelWriterStepMeta.class, ExcelWriterStepData.class );
-    when( mockHelper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
-        mockHelper.logChannelInterface );
-    step =
-      new ExcelWriterStep(
-        mockHelper.stepMeta, mockHelper.stepDataInterface, 0, mockHelper.transMeta, mockHelper.trans );
+    when( stepMockHelper.logChannelInterfaceFactory.create( any(), any( LoggingObjectInterface.class ) ) ).thenReturn(
+        stepMockHelper.logChannelInterface );
+        when( stepMockHelper.trans.isRunning() ).thenReturn( true );
 
-
+    Object[] inputRow = new Object[] {};
+    RowSet inputRowSet = stepMockHelper.getMockInputRowSet( inputRow );
+    RowMetaInterface mockInputRowMeta = mock( RowMetaInterface.class );
+    RowMetaInterface mockOutputRowMeta = mock( RowMetaInterface.class );
+    when( mockOutputRowMeta.size() ).thenReturn( 0 );
+    when( mockInputRowMeta.size() ).thenReturn( 0 );
+    when( inputRowSet.getRowMeta() ).thenReturn( mockInputRowMeta );
+    when( mockInputRowMeta.clone() ).thenReturn( mockOutputRowMeta );
+    when( mockInputRowMeta.isNull( any( Object[].class ), anyInt() ) ).thenReturn( true );
 
     // TODO Do we need spy? Or do nothing when next output file?
     // step = spy( step );
     // // ignoring to avoid useless errors in log
     // doNothing().when( step ).prepareNextOutputFile();
 
+    step =
+      new ExcelWriterStep(
+        stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
+
     stepMeta = new ExcelWriterStepMeta();
     stepData = new ExcelWriterStepData();
 
     // TODO Do we need to initialize step?
-    step.init( mockHelper.initStepMetaInterface, stepData );
+    step.init( stepMockHelper.initStepMetaInterface, stepData );
+  }
+
+  @After
+  public void tearDown() {
+    stepMockHelper.cleanUp();
   }
 
   @Test
@@ -101,10 +114,11 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepMeta( "xls" );
     createStepData( "xls" );
 
+    step.init( stepMeta, stepData );
 
     // step.prepareNextOutputFile();
-
-
+    Object[] row = createData();
+    step.writeNextLine( row );
 
     // TODO Some redundant tests just to verify it is working
     step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
