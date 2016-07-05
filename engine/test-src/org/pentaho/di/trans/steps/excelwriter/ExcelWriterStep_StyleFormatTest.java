@@ -26,6 +26,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.core.RowSet;
+import org.pentaho.di.core.row.ValueMetaAndData;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
@@ -40,6 +41,7 @@ import java.io.OutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 import org.junit.After;
 import org.junit.Before;
@@ -96,7 +98,7 @@ public class ExcelWriterStep_StyleFormatTest {
     step.init( stepMeta, stepData );
 
     // step.prepareNextOutputFile();
-    step.writeNextLine( rows.toArray() );
+    step.writeNextLine( rows.get(0) );
 
     // TODO Some redundant tests just to verify it is working
     step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
@@ -144,7 +146,7 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setStartingCell( "B3" );
 
     stepMeta.setTemplateEnabled( true );
-    stepMeta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
+    // stepMeta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
     stepMeta.setTemplateSheetName( "SheetAsWell" );
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
@@ -198,8 +200,6 @@ public class ExcelWriterStep_StyleFormatTest {
     RowMetaInterface mockOutputRowMeta = mock( RowMetaInterface.class );
     when( mockOutputRowMeta.size() ).thenReturn( outFields.length );
     when( inputRowSet.getRowMeta() ).thenReturn( inputRowMeta );
-    when( inputRowSet.getRowWait( anyInt(), anyObject() ) ).thenReturn( rows.isEmpty() ? null : rows.iterator()
-        .next() );
 
     step.getInputRowSets().add( inputRowSet );
     step.setInputRowMeta( inputRowMeta );
@@ -213,25 +213,36 @@ public class ExcelWriterStep_StyleFormatTest {
 
   private ArrayList<Object[]> createRowData() throws Exception {
     ArrayList<Object[]> r = new ArrayList<Object[]>();
-    Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
-    r.add(row);
-    row = new Object[] {new Integer(123456), new Double(4.6789e10), new Double(111111e-2), new Long(12312300)};
-    r.add(row);
+    if( true ) {
+      Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
+      r.add(row);
+      row = new Object[] {new Integer(123456), new Double(4.6789e10), new Double(111111e-2), new Long(12312300)};
+      r.add(row);
+    } else {
+      // ValueMetaAndData, but may not work during writeLine()
+      Object[] row = new Object[]{
+        new ValueMetaAndData("col 1", 1000),
+        new ValueMetaAndData("col 2", new Double(2.34e-4)),
+        new ValueMetaAndData("col 3", new BigDecimal("123456789.987654321")),
+        new ValueMetaAndData("col 4", new Long(5010))
+      };
+      r.add(row);
+    }
     return r;
   }
 
   public RowMetaInterface createRowMeta() throws KettleException{
     RowMetaInterface rm = new RowMeta();
     try {
-      ValueMetaInterface[] valuesMeta = {
-        ValueMetaFactory.createValueMeta( "col 1", ValueMetaInterface.TYPE_INTEGER ),
-        ValueMetaFactory.createValueMeta( "col 2", ValueMetaInterface.TYPE_BIGNUMBER ),
-        ValueMetaFactory.createValueMeta( "col 3", ValueMetaInterface.TYPE_NUMBER ),
-        ValueMetaFactory.createValueMeta( "col 4", ValueMetaInterface.TYPE_BIGNUMBER )
-      };
-      for ( int i = 0; i < valuesMeta.length; i++ ) {
-        rm.addValueMeta( valuesMeta[i] );
-      }
+//      ValueMetaInterface[] valuesMeta = {
+//        ValueMetaFactory.createValueMeta( "col 1", ValueMetaInterface.TYPE_INTEGER ),
+//        ValueMetaFactory.createValueMeta( "col 2", ValueMetaInterface.TYPE_BIGNUMBER ),
+//        ValueMetaFactory.createValueMeta( "col 3", ValueMetaInterface.TYPE_NUMBER ),
+//        ValueMetaFactory.createValueMeta( "col 4", ValueMetaInterface.TYPE_BIGNUMBER )
+//      };
+//      for ( int i = 0; i < valuesMeta.length; i++ ) {
+//        rm.addValueMeta( valuesMeta[i] );
+//      }
     } catch ( Exception ex ) {
       return null;
     }
