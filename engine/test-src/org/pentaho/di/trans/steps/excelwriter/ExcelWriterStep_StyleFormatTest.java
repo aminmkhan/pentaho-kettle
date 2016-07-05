@@ -22,6 +22,7 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.commons.vfs2.FileObject;
@@ -67,7 +68,7 @@ public class ExcelWriterStep_StyleFormatTest {
   private static final String SHEET_NAME = "Sheet1";
   private static final String FILE_TYPE = "xls";
 
-  private HSSFWorkbook wb;
+  private Workbook wb;
   private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
   private ExcelWriterStep step;
   private ExcelWriterStepMeta stepMeta;
