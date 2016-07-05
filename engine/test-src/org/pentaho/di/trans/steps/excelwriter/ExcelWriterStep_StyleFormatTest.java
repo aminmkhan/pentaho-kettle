@@ -32,6 +32,8 @@ import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
+import org.pentaho.di.core.row.ValueMetaInterface;
+import org.pentaho.di.core.row.value.ValueMetaString;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 import java.io.OutputStream;
@@ -91,7 +93,7 @@ public class ExcelWriterStep_StyleFormatTest {
     setupStepMock();
 
     // step.prepareNextOutputFile();
-    step.writeNextLine( rows.toArray() );
+//    step.writeNextLine( rows.toArray() );
 
     // TODO Some redundant tests just to verify it is working
     step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
@@ -128,6 +130,8 @@ public class ExcelWriterStep_StyleFormatTest {
     // TODO Try to load the template file present for ExcelOutput step
     String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
     templateFilePath = "chart-template.xls";
+
+    stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
 
     stepMeta.setFileName( path.replace( "." + fileType, "" ) );
@@ -155,6 +159,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   private void createStepData( String fileType ) throws KettleException {
+    stepData = new ExcelWriterStepData();
 
     // start writing from cell B3 in template
     stepData.startingRow = 2;
@@ -170,11 +175,7 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
 
-    // remember where the output fields are in the input row
-    stepData.fieldnrs = new int[stepMeta.getOutputFields().length];
-    for ( int i = 0; i < stepMeta.getOutputFields().length; i++ ) {
-      stepData.fieldnrs[i] = i;
-    }
+    stepData.fieldnrs = new int[] {0, 1, 2, 3};
   }
 
   private void setupStepMock() throws Exception {
@@ -201,16 +202,23 @@ public class ExcelWriterStep_StyleFormatTest {
     when( inputRowSet.getRowWait( anyInt(), anyObject() ) ).thenReturn( rows.isEmpty() ? null : rows.iterator()
         .next() );
 
-
     step.getInputRowSets().add( inputRowSet );
     step.setInputRowMeta( mockInputRowMeta );
     step.getOutputRowSets().add( inputRowSet );
 
-    stepMeta = new ExcelWriterStepMeta();
     createStepMeta( FILE_TYPE );
-    stepData = new ExcelWriterStepData();
     createStepData( FILE_TYPE );
     step.init( stepMeta, stepData );
+
+    RowMetaInterface rowMetaInterface = new RowMeta();
+    ValueMetaInterface valueMeta = new ValueMetaString( "field1" );
+    valueMeta.setStorageMetadata( new ValueMetaString( "field1" ) );
+    valueMeta.setStorageType( ValueMetaInterface.STORAGE_TYPE_BINARY_STRING );
+    rowMetaInterface.addValueMeta( valueMeta );
+    when( inputRowSet.getRowMeta() ).thenReturn( rowMetaInterface );
+    step.setInputRowMeta( rowMetaInterface.clone() );
+
+
 
     // TODO Do we need spy? Or do nothing when next output file?
     // step = spy( step );
