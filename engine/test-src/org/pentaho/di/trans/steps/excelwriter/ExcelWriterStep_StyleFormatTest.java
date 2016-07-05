@@ -70,11 +70,6 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Before
   public void setUp() throws Exception {
-    // TODO Avoid even creating file in RAM
-    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + FILE_TYPE );
-    FileObject xlsFile = TestUtils.getFileObject( path );
-    wb = createWorkbook( xlsFile );
-
     stepMockHelper =
       new StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData>(
         "Excel Writer Style Format Test", ExcelWriterStepMeta.class, ExcelWriterStepData.class );
@@ -84,45 +79,6 @@ public class ExcelWriterStep_StyleFormatTest {
     verify( stepMockHelper.logChannelInterface, never() ).logError( anyString(), any( Object[].class ) );
     verify( stepMockHelper.logChannelInterface, never() ).logError( anyString(), (Throwable) anyObject() );
     when( stepMockHelper.trans.isRunning() ).thenReturn( true );
-
-    Object[] inputRow = new Object[] {};
-    RowSet inputRowSet = stepMockHelper.getMockInputRowSet( inputRow );
-    RowMetaInterface mockInputRowMeta = mock( RowMetaInterface.class );
-    RowMetaInterface mockOutputRowMeta = mock( RowMetaInterface.class );
-    when( mockOutputRowMeta.size() ).thenReturn( 0 );
-    when( mockInputRowMeta.size() ).thenReturn( 0 );
-    when( inputRowSet.getRowMeta() ).thenReturn( mockInputRowMeta );
-    when( mockInputRowMeta.clone() ).thenReturn( mockOutputRowMeta );
-    when( mockInputRowMeta.isNull( any( Object[].class ), anyInt() ) ).thenReturn( true );
-
-    step =
-      new ExcelWriterStep(
-        stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
-
-    rows = createData();
-    RowSet rowSet = stepMockHelper.getMockInputRowSet( rows );
-    RowMetaInterface inputRowMeta = mock( RowMetaInterface.class );
-    step.setInputRowMeta( inputRowMeta );
-
-    when( rowSet.getRowWait( anyInt(), anyObject() ) ).thenReturn( rows.isEmpty() ? null : rows.iterator()
-        .next() );
-    when( rowSet.getRowMeta() ).thenReturn( inputRowMeta );
-    when( inputRowMeta.clone() ).thenReturn( inputRowMeta );
-
-    stepMeta = new ExcelWriterStepMeta();
-    createStepMeta( FILE_TYPE );
-    stepData = new ExcelWriterStepData();
-    createStepData( FILE_TYPE );
-
-    step.getInputRowSets().add( rowSet );
-    step.getOutputRowSets().add( rowSet );
-
-    step.init( stepMeta, stepData );
-
-    // TODO Do we need spy? Or do nothing when next output file?
-    // step = spy( step );
-    // // ignoring to avoid useless errors in log
-    // doNothing().when( step ).prepareNextOutputFile();
   }
 
   @After
@@ -132,13 +88,9 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void testStyleFormatHssf() throws Exception {
-    createStepMeta( "xls" );
-    createStepData( "xls" );
-
-    step.init( stepMeta, stepData );
+    setupStepMock();
 
     // step.prepareNextOutputFile();
-    rows = createData();
     step.writeNextLine( rows.toArray() );
 
     // TODO Some redundant tests just to verify it is working
@@ -225,12 +177,54 @@ public class ExcelWriterStep_StyleFormatTest {
     }
   }
 
+  private void setupStepMock() throws Exception {
+    // TODO Avoid even creating file in RAM
+    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + FILE_TYPE );
+    FileObject xlsFile = TestUtils.getFileObject( path );
+    wb = createWorkbook( xlsFile );
+
+    step =
+      new ExcelWriterStep(
+        stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
+    step.init( stepMockHelper.initStepMetaInterface, stepMockHelper.initStepDataInterface );
+
+    rows = createData();
+    String[] outFields = new String[] { "col 1", "col 2", "col 3", "col 4" };
+    RowSet inputRowSet = stepMockHelper.getMockInputRowSet( rows );
+    RowMetaInterface mockInputRowMeta = mock( RowMetaInterface.class );
+    RowMetaInterface mockOutputRowMeta = mock( RowMetaInterface.class );
+    when( mockInputRowMeta.size() ).thenReturn( rows.size() );
+    when( mockOutputRowMeta.size() ).thenReturn( outFields.length );
+    when( inputRowSet.getRowMeta() ).thenReturn( mockInputRowMeta );
+    when( mockInputRowMeta.clone() ).thenReturn( mockOutputRowMeta );
+    when( mockInputRowMeta.isNull( any( Object[].class ), anyInt() ) ).thenReturn( true );
+    when( inputRowSet.getRowWait( anyInt(), anyObject() ) ).thenReturn( rows.isEmpty() ? null : rows.iterator()
+        .next() );
+
+
+    step.getInputRowSets().add( inputRowSet );
+    step.setInputRowMeta( mockInputRowMeta );
+    step.getOutputRowSets().add( inputRowSet );
+
+    stepMeta = new ExcelWriterStepMeta();
+    createStepMeta( FILE_TYPE );
+    stepData = new ExcelWriterStepData();
+    createStepData( FILE_TYPE );
+    step.init( stepMeta, stepData );
+
+    // TODO Do we need spy? Or do nothing when next output file?
+    // step = spy( step );
+    // // ignoring to avoid useless errors in log
+    // doNothing().when( step ).prepareNextOutputFile();
+  }
+
   private ArrayList<Object[]> createData() throws Exception {
+    ArrayList<Object[]> r = new ArrayList<Object[]>();
     Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
-    ArrayList<Object[]> rows = new ArrayList<Object[]>();
-    rows.add(row);
-    rows.add(row);
-    return rows;
+    r.add(row);
+    row = new Object[] {new Integer(123456), new Double(4.6789e10), new Double(111111e-2), new Long(12312300)};
+    r.add(row);
+    return r;
   }
 
   private HSSFWorkbook createWorkbook( FileObject file ) throws Exception {
