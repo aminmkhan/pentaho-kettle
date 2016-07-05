@@ -40,6 +40,8 @@ import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
 import org.pentaho.di.core.row.value.ValueMetaString;
+import org.pentaho.di.trans.Trans;
+import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
 
 import java.io.OutputStream;
@@ -64,9 +66,6 @@ import static org.mockito.Mockito.verify;
  * @author Amin Khan
  */
 public class ExcelWriterStep_StyleFormatTest {
-
-  private static final String SHEET_NAME = "Sheet1";
-  private static final String FILE_TYPE = "xls";
 
   private Workbook wb;
   private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
@@ -97,25 +96,28 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void testStyleFormatHssf() throws Exception {
-    setupStepMock();
-    createStepMeta( FILE_TYPE );
-    createStepData( FILE_TYPE );
+    String fileType = "xls";
+    setupStepMock( fileType );
+    createStepMeta( fileType );
+    createStepData( fileType );
     step.init( stepMeta, stepData );
+
+    // TODO Try to load the template file present for ExcelOutput step
+    String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
+    templateFilePath = "chart-template.xls";
 
     // step.prepareNextOutputFile();
     step.writeNextLine( rows.get(0) );
-
-    // TODO Some redundant tests just to verify it is working
-    step.protectSheet( wb.getSheet( SHEET_NAME ), "aa" );
-    assertTrue( wb.getSheet( SHEET_NAME ).getProtect() );
 
   }
 
   // @Test
   public void testStyleFormatXssf() throws Exception {
     // TODO Test for both xls and xlsx
-    createStepMeta( "xlsx" );
-    createStepData( "xlsx" );
+    String fileType = "xlsx";
+    setupStepMock( fileType );
+    createStepMeta( fileType );
+    createStepData( fileType );
   }
 
   // @Test
@@ -137,10 +139,6 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   private void createStepMeta( String fileType ) throws KettleException, IOException {
-    // TODO Try to load the template file present for ExcelOutput step
-    String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
-    templateFilePath = "chart-template.xls";
-
     stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
 
@@ -151,7 +149,7 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setStartingCell( "B3" );
 
     stepMeta.setTemplateEnabled( true );
-    // stepMeta.setTemplateFileName( getClass().getResource( templateFilePath ).getFile() );
+    stepMeta.setTemplateFileName( "testExcelStyle." + fileType );
     stepMeta.setTemplateSheetName( "SheetAsWell" );
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
@@ -190,9 +188,9 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.fieldnrs = new int[] {0, 1, 2, 3};
   }
 
-  private void setupStepMock() throws Exception {
+  private void setupStepMock( String fileType ) throws Exception {
     // TODO Avoid even creating file in RAM
-    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + FILE_TYPE );
+    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + fileType );
     FileObject xlsFile = TestUtils.getFileObject( path );
     wb = createWorkbook( xlsFile );
 
@@ -214,10 +212,13 @@ public class ExcelWriterStep_StyleFormatTest {
     step.setInputRowMeta( inputRowMeta );
     step.getOutputRowSets().add( inputRowSet );
 
-    // TODO Do we need spy? Or do nothing when next output file?
     // step = spy( step );
     // // ignoring to avoid useless errors in log
     // doNothing().when( step ).prepareNextOutputFile();
+    // TransMeta mockTransMeta = mock( TransMeta.class );
+    // Trans mockTrans = mock( Trans.class );
+    // when( step.getTransMeta() ).thenReturn( mockTransMeta );
+    // when( step.getTrans() ).thenReturn( mockTrans );
   }
 
   private ArrayList<Object[]> createRowData() throws Exception {
@@ -240,7 +241,7 @@ public class ExcelWriterStep_StyleFormatTest {
     return r;
   }
 
-  public RowMetaInterface createRowMeta() throws KettleException{
+  private RowMetaInterface createRowMeta() throws KettleException{
     RowMetaInterface rm = new RowMeta();
     try {
       ValueMetaInterface[] valuesMeta = {
@@ -264,7 +265,7 @@ public class ExcelWriterStep_StyleFormatTest {
     try {
       os = file.getContent().getOutputStream();
       wb = new HSSFWorkbook();
-      wb.createSheet( SHEET_NAME );
+      wb.createSheet( "Sheet1" );
       wb.write( os );
     } finally {
       os.flush();
