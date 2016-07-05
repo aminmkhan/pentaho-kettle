@@ -27,6 +27,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.core.RowSet;
 import org.pentaho.di.core.row.ValueMetaAndData;
+import org.pentaho.di.core.row.value.ValueMetaBigNumber;
+import org.pentaho.di.core.row.value.ValueMetaInteger;
+import org.pentaho.di.core.row.value.ValueMetaNumber;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
@@ -197,6 +200,7 @@ public class ExcelWriterStep_StyleFormatTest {
     String[] outFields = new String[] { "col 1", "col 2", "col 3", "col 4" };
     RowSet inputRowSet = stepMockHelper.getMockInputRowSet( rows );
     RowMetaInterface inputRowMeta = createRowMeta();
+    inputRowSet.setRowMeta( inputRowMeta );
     RowMetaInterface mockOutputRowMeta = mock( RowMetaInterface.class );
     when( mockOutputRowMeta.size() ).thenReturn( outFields.length );
     when( inputRowSet.getRowMeta() ).thenReturn( inputRowMeta );
@@ -213,7 +217,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
   private ArrayList<Object[]> createRowData() throws Exception {
     ArrayList<Object[]> r = new ArrayList<Object[]>();
-    if( true ) {
+    if( false ) {
       Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
       r.add(row);
       row = new Object[] {new Integer(123456), new Double(4.6789e10), new Double(111111e-2), new Long(12312300)};
@@ -234,15 +238,15 @@ public class ExcelWriterStep_StyleFormatTest {
   public RowMetaInterface createRowMeta() throws KettleException{
     RowMetaInterface rm = new RowMeta();
     try {
-//      ValueMetaInterface[] valuesMeta = {
-//        ValueMetaFactory.createValueMeta( "col 1", ValueMetaInterface.TYPE_INTEGER ),
-//        ValueMetaFactory.createValueMeta( "col 2", ValueMetaInterface.TYPE_BIGNUMBER ),
-//        ValueMetaFactory.createValueMeta( "col 3", ValueMetaInterface.TYPE_NUMBER ),
-//        ValueMetaFactory.createValueMeta( "col 4", ValueMetaInterface.TYPE_BIGNUMBER )
-//      };
-//      for ( int i = 0; i < valuesMeta.length; i++ ) {
-//        rm.addValueMeta( valuesMeta[i] );
-//      }
+      ValueMetaInterface[] valuesMeta = {
+        new ValueMetaInteger( "col 1" ),
+        new ValueMetaNumber( "col 2" ),
+        new ValueMetaBigNumber( "col 3" ),
+        new ValueMetaNumber( "col 4" )
+      };
+      for ( int i = 0; i < valuesMeta.length; i++ ) {
+        rm.addValueMeta( valuesMeta[i] );
+      }
     } catch ( Exception ex ) {
       return null;
     }
