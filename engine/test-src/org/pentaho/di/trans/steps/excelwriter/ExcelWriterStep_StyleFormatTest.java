@@ -94,7 +94,7 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepMeta( FILE_TYPE );
     createStepData( FILE_TYPE );
     step.init( stepMeta, stepData );
-    
+
     // step.prepareNextOutputFile();
     step.writeNextLine( rows.toArray() );
 
@@ -220,15 +220,15 @@ public class ExcelWriterStep_StyleFormatTest {
     return r;
   }
 
-  public RowMetaInterface createRowMeta() {
+  public RowMetaInterface createRowMeta() throws KettleException{
     RowMetaInterface rm = new RowMeta();
     try {
-      ValueMetaInterface[] valuesMeta =
-      {
+      ValueMetaInterface[] valuesMeta = {
         ValueMetaFactory.createValueMeta( "col 1", ValueMetaInterface.TYPE_INTEGER ),
         ValueMetaFactory.createValueMeta( "col 2", ValueMetaInterface.TYPE_BIGNUMBER ),
         ValueMetaFactory.createValueMeta( "col 3", ValueMetaInterface.TYPE_NUMBER ),
-        ValueMetaFactory.createValueMeta( "col 4", ValueMetaInterface.TYPE_BIGNUMBER ) };
+        ValueMetaFactory.createValueMeta( "col 4", ValueMetaInterface.TYPE_BIGNUMBER )
+      };
       for ( int i = 0; i < valuesMeta.length; i++ ) {
         rm.addValueMeta( valuesMeta[i] );
       }
