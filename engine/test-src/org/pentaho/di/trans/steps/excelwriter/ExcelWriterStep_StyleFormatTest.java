@@ -30,6 +30,7 @@ import org.pentaho.di.core.row.ValueMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaBigNumber;
 import org.pentaho.di.core.row.value.ValueMetaInteger;
 import org.pentaho.di.core.row.value.ValueMetaNumber;
+import org.pentaho.di.core.vfs.KettleVFS;
 import org.pentaho.di.utils.TestUtils;
 import org.pentaho.di.core.exception.KettleException;
 import org.pentaho.di.core.logging.LoggingObjectInterface;
@@ -179,8 +180,11 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.outputRowMeta = step.getInputRowMeta().clone();
     stepData.firstFileOpened = true;
 
+    stepData.clearStyleCache( 4 );
+
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
+    // stepData.file = KettleVFS.getFileObject( buildFilename, getTransMeta() );
 
     stepData.fieldnrs = new int[] {0, 1, 2, 3};
   }
