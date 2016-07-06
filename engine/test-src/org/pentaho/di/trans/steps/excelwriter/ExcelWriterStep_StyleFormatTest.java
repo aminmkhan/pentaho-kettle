@@ -23,6 +23,10 @@
 package org.pentaho.di.trans.steps.excelwriter;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -204,6 +208,23 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.sheet = stepData.wb.createSheet();
     stepData.file = null;
     stepData.clearStyleCache( numOfFields );
+
+    // set cells with custom style and formatting
+    CellStyle cellStyle = stepData.wb.createCellStyle();
+    DataFormat format = stepData.wb.createDataFormat();
+    Row xlsRow = stepData.sheet.createRow( 0 );
+
+    Cell cell = xlsRow.createCell( 8 );
+    cellStyle.setBorderRight( CellStyle.BORDER_THIN );
+    cellStyle.setFillPattern( CellStyle.BIG_SPOTS );
+    cell.setCellStyle( cellStyle );
+
+    cell = xlsRow.createCell( 9 );
+    cellStyle = stepData.wb.createCellStyle();
+    cellStyle.setBorderRight( CellStyle.BORDER_THIN );
+    cellStyle.setFillPattern( CellStyle.BIG_SPOTS );
+    cellStyle.setDataFormat( format.getFormat( "0.0" ) );
+    cell.setCellStyle( cellStyle );
   }
 
   private void setupStepMock( String fileType ) throws Exception {
