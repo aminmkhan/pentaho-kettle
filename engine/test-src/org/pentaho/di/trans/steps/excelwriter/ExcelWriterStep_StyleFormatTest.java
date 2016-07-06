@@ -179,37 +179,31 @@ public class ExcelWriterStep_StyleFormatTest {
 
   private void createStepData( String fileType ) throws KettleException {
     stepData = new ExcelWriterStepData();
+    stepData.inputRowMeta = step.getInputRowMeta().clone();
+    stepData.outputRowMeta = step.getInputRowMeta().clone();
 
-    // start writing from cell B3 in template
     CellReference cellRef = new CellReference( stepMeta.getStartingCell() );
     stepData.startingRow = cellRef.getRow();
     stepData.startingCol = cellRef.getCol();
     stepData.posX = stepData.startingCol;
     stepData.posY = stepData.startingRow ;
 
-    stepData.inputRowMeta = step.getInputRowMeta().clone();
-    stepData.outputRowMeta = step.getInputRowMeta().clone();
-    stepData.firstFileOpened = true;
 
     int numOfFields = stepData.inputRowMeta.size();
-
     stepData.fieldnrs = new int[numOfFields];
     stepData.linkfieldnrs = new int[numOfFields];
     stepData.commentfieldnrs = new int[numOfFields];
-
     for ( int i = 0; i < numOfFields; i++ ) {
       stepData.fieldnrs[i] = i;
       stepData.linkfieldnrs[i] = -1;
       stepData.commentfieldnrs[i] = -1;
     }
 
-    stepData.clearStyleCache( numOfFields );
-
     // create Excel workbook
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
     stepData.file = null;
-
+    stepData.clearStyleCache( numOfFields );
   }
 
   private void setupStepMock( String fileType ) throws Exception {
