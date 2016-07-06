@@ -186,6 +186,8 @@ public class ExcelWriterStep_StyleFormatTest {
     // stepData.file = KettleVFS.getFileObject( buildFilename, getTransMeta() );
 
     stepData.fieldnrs = new int[] {0, 1, 2, 3};
+    stepData.linkfieldnrs = new int[] {-1, -1, -1, -1};
+    stepData.commentfieldnrs = new int[] {-1, -1, -1, -1};
   }
 
   private void setupStepMock( String fileType ) throws Exception {
@@ -223,21 +225,10 @@ public class ExcelWriterStep_StyleFormatTest {
 
   private ArrayList<Object[]> createRowData() throws Exception {
     ArrayList<Object[]> r = new ArrayList<Object[]>();
-    if( false ) {
-      Object[] row = new Object[] {new Integer(1000), new Double(2.34e-4), new Double(40120), new Long(5010)};
-      r.add(row);
-      row = new Object[] {new Integer(123456), new Double(4.6789e10), new Double(111111e-2), new Long(12312300)};
-      r.add(row);
-    } else {
-      // ValueMetaAndData, but may not work during writeLine()
-      Object[] row = new Object[]{
-        new ValueMetaAndData("col 1", 1000),
-        new ValueMetaAndData("col 2", new Double(2.34e-4)),
-        new ValueMetaAndData("col 3", new BigDecimal("123456789.987654321")),
-        new ValueMetaAndData("col 4", new Long(5010))
-      };
-      r.add(row);
-    }
+    Object[] row = new Object[] {new Long(1001001), new Double(2.34e-4), new BigDecimal(40120), new Double(504150)};
+    r.add(row);
+    row = new Object[] {new Long(123456), new Double(4.6789e10), new BigDecimal(111111e-2), new Double(12312300)};
+    r.add(row);
     return r;
   }
 
