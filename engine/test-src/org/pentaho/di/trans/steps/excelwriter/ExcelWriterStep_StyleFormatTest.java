@@ -155,15 +155,24 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setTemplateFileName( "testExcelStyle." + fileType );
     stepMeta.setTemplateSheetName( "Sheet1" );
 
+    // Try different combinations of specifying data format and style from cell
+    //   1. No format, only style
+    //   2. Format different than the style
+    //   3. Only format, no style
+    //   4. Format different than the existing custom format of the style
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
     outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
-    outputFields[0].setStyleCell( "B3" );
+    outputFields[0].setStyleCell( "H1" );
+    outputFields[0].setFormat( "" );
     outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0" );
-    outputFields[1].setStyleCell( "B2" );
+    outputFields[1].setStyleCell( "H1" );
+    outputFields[1].setFormat( "0.00" );
     outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
     outputFields[2].setStyleCell( "" );
+    outputFields[2].setFormat( "0.0000" );
     outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
-    outputFields[3].setStyleCell( "B2" );
+    outputFields[3].setStyleCell( "I1" );
+    outputFields[3].setFormat( "0.0000" );
 
     stepMeta.setOutputFields( outputFields );
   }
