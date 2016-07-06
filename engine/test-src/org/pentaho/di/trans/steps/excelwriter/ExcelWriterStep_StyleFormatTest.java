@@ -23,9 +23,9 @@
 package org.pentaho.di.trans.steps.excelwriter;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.commons.vfs2.FileObject;
 import org.pentaho.di.core.RowSet;
 import org.pentaho.di.core.row.ValueMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaBigNumber;
@@ -172,20 +172,15 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData = new ExcelWriterStepData();
 
     // start writing from cell B3 in template
-    stepData.startingRow = 2;
-    stepData.startingCol = 1;
+    CellReference cellRef = new CellReference( stepMeta.getStartingCell() );
+    stepData.startingRow = cellRef.getRow();
+    stepData.startingCol = cellRef.getCol();
     stepData.posX = stepData.startingCol;
     stepData.posY = stepData.startingRow ;
 
     stepData.inputRowMeta = step.getInputRowMeta().clone();
     stepData.outputRowMeta = step.getInputRowMeta().clone();
     stepData.firstFileOpened = true;
-
-    stepData.clearStyleCache( 4 );
-
-    stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
-    stepData.sheet = stepData.wb.createSheet();
-    // stepData.file = KettleVFS.getFileObject( buildFilename, getTransMeta() );
 
     int numOfFields = stepData.inputRowMeta.size();
 
@@ -202,9 +197,9 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.clearStyleCache( numOfFields );
 
     // create Excel workbook
-    stepData.wb = fileType.equalsIgnoreCase( "xlsx" ) ? new XSSFWorkbook() : new HSSFWorkbook();
-    stepData.sheet = stepData.wb.createSheet( "Sheet1" );
-
+    stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
+    stepData.sheet = stepData.wb.createSheet();
+    stepData.file = null;
 
   }
 
