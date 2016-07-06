@@ -67,14 +67,10 @@ import static org.mockito.Mockito.verify;
  */
 public class ExcelWriterStep_StyleFormatTest {
 
-  private Workbook wb;
   private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
   private ExcelWriterStep step;
   private ExcelWriterStepMeta stepMeta;
   private ExcelWriterStepData stepData;
-
-  private String path;
-  private List<Object[]> rows = new ArrayList<Object[]>();
 
   @Before
   public void setUp() throws Exception {
@@ -112,6 +108,7 @@ public class ExcelWriterStep_StyleFormatTest {
     templateFilePath = "chart-template.xls";
 
     // step.prepareNextOutputFile();
+    List<Object[]> rows = createRowData();
     step.writeNextLine( rows.get(0) );
 
   }
@@ -147,15 +144,16 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
 
+    String path = "testExcel" + "." + fileType;
     stepMeta.setFileName( path.replace( "." + fileType, "" ) );
     stepMeta.setExtension( fileType );
-    stepMeta.setSheetname( "Sheet101" );
+    stepMeta.setSheetname( "Sheet1" );
     stepMeta.setHeaderEnabled( true );
-    stepMeta.setStartingCell( "B3" );
+    stepMeta.setStartingCell( "A2" );
 
-    stepMeta.setTemplateEnabled( true );
+    stepMeta.setTemplateEnabled( false );
     stepMeta.setTemplateFileName( "testExcelStyle." + fileType );
-    stepMeta.setTemplateSheetName( "SheetAsWell" );
+    stepMeta.setTemplateSheetName( "Sheet1" );
 
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
     outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
@@ -168,7 +166,6 @@ public class ExcelWriterStep_StyleFormatTest {
     outputFields[3].setStyleCell( "B2" );
 
     stepMeta.setOutputFields( outputFields );
-
   }
 
   private void createStepData( String fileType ) throws KettleException {
@@ -203,20 +200,21 @@ public class ExcelWriterStep_StyleFormatTest {
     }
 
     stepData.clearStyleCache( numOfFields );
+
+    // create Excel workbook
+    stepData.wb = fileType.equalsIgnoreCase( "xlsx" ) ? new XSSFWorkbook() : new HSSFWorkbook();
+    stepData.sheet = stepData.wb.createSheet( "Sheet1" );
+
+
   }
 
   private void setupStepMock( String fileType ) throws Exception {
-    // TODO Avoid even creating file in RAM
-    path = TestUtils.createRamFile( getClass().getSimpleName() + "/testExcelStyle." + fileType );
-    FileObject xlsFile = TestUtils.getFileObject( path );
-    wb = createWorkbook( xlsFile );
-
     step =
       new ExcelWriterStep(
         stepMockHelper.stepMeta, stepMockHelper.stepDataInterface, 0, stepMockHelper.transMeta, stepMockHelper.trans );
     step.init( stepMockHelper.initStepMetaInterface, stepMockHelper.initStepDataInterface );
 
-    rows = createRowData();
+    List<Object[]> rows = createRowData();
     String[] outFields = new String[] { "col 1", "col 2", "col 3", "col 4" };
     RowSet inputRowSet = stepMockHelper.getMockInputRowSet( rows );
     RowMetaInterface inputRowMeta = createRowMeta();
@@ -239,12 +237,12 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   private ArrayList<Object[]> createRowData() throws Exception {
-    ArrayList<Object[]> r = new ArrayList<Object[]>();
+    ArrayList<Object[]> rows = new ArrayList<Object[]>();
     Object[] row = new Object[] {new Long(1001001), new Double(2.34e-4), new BigDecimal(40120), new Double(504150)};
-    r.add(row);
+    rows.add(row);
     row = new Object[] {new Long(123456), new Double(4.6789e10), new BigDecimal(111111e-2), new Double(12312300)};
-    r.add(row);
-    return r;
+    rows.add(row);
+    return rows;
   }
 
   private RowMetaInterface createRowMeta() throws KettleException{
@@ -263,21 +261,6 @@ public class ExcelWriterStep_StyleFormatTest {
       return null;
     }
     return rm;
-  }
-
-  private HSSFWorkbook createWorkbook( FileObject file ) throws Exception {
-    HSSFWorkbook wb = null;
-    OutputStream os = null;
-    try {
-      os = file.getContent().getOutputStream();
-      wb = new HSSFWorkbook();
-      wb.createSheet( "Sheet1" );
-      wb.write( os );
-    } finally {
-      os.flush();
-      os.close();
-    }
-    return wb;
   }
 
 }
