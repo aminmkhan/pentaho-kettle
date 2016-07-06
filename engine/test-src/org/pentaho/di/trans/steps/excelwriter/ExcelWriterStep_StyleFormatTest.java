@@ -91,6 +91,11 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @After
   public void tearDown() {
+    stepData.file = null;
+    stepData.sheet = null;
+    stepData.wb = null;
+    stepData.clearStyleCache( 0 );
+
     stepMockHelper.cleanUp();
   }
 
@@ -185,9 +190,19 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.sheet = stepData.wb.createSheet();
     // stepData.file = KettleVFS.getFileObject( buildFilename, getTransMeta() );
 
-    stepData.fieldnrs = new int[] {0, 1, 2, 3};
-    stepData.linkfieldnrs = new int[] {-1, -1, -1, -1};
-    stepData.commentfieldnrs = new int[] {-1, -1, -1, -1};
+    int numOfFields = stepData.inputRowMeta.size();
+
+    stepData.fieldnrs = new int[numOfFields];
+    stepData.linkfieldnrs = new int[numOfFields];
+    stepData.commentfieldnrs = new int[numOfFields];
+
+    for ( int i = 0; i < numOfFields; i++ ) {
+      stepData.fieldnrs[i] = i;
+      stepData.linkfieldnrs[i] = -1;
+      stepData.commentfieldnrs[i] = -1;
+    }
+
+    stepData.clearStyleCache( numOfFields );
   }
 
   private void setupStepMock( String fileType ) throws Exception {
