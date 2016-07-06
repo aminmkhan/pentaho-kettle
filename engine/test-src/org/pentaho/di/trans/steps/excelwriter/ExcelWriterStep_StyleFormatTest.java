@@ -107,14 +107,32 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepData( fileType );
     step.init( stepMeta, stepData );
 
-    // TODO Try to load the template file present for ExcelOutput step
-    String templateFilePath = "/org/pentaho/di/trans/steps/exceloutput/chart-template.xls";
-    templateFilePath = "chart-template.xls";
-
-    // step.prepareNextOutputFile();
     List<Object[]> rows = createRowData();
-    step.writeNextLine( rows.get(0) );
+    for ( int i = 0; i < rows.size(); i++ ) {
+      step.writeNextLine( rows.get(i) );
+    }
 
+    // get style of the written cell
+    Row xlsRow = stepData.sheet.getRow( 2 );
+    Cell cell = xlsRow.getCell( 0 );
+    CellStyle cellStyle = cell.getCellStyle();
+    DataFormat format = stepData.wb.createDataFormat();
+
+    // cell with no custom style
+    assertFalse( cellStyle.getBorderRight() == CellStyle.BORDER_THIN );
+    assertFalse( cellStyle.getFillPattern() == CellStyle.BIG_SPOTS  );
+    assertEquals( cellStyle.getDataFormat(), format.getFormat( "0.0" ) );
+
+    // all cells retain their style
+    for ( int i = 1; i < stepData.inputRowMeta.size(); i++ ) {
+      cell = xlsRow.getCell( i );
+      cellStyle = cell.getCellStyle();
+
+      assertEquals( cellStyle.getBorderRight(), CellStyle.BORDER_THIN );
+      assertEquals( cellStyle.getFillPattern(), CellStyle.BIG_SPOTS );
+    }
+
+    // Cell cell = stepData.wb.getCe
   }
 
   // @Test
@@ -160,23 +178,19 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setTemplateSheetName( "Sheet1" );
 
     // Try different combinations of specifying data format and style from cell
-    //   1. No format, only style
-    //   2. Format different than the style
-    //   3. Only format, no style
+    //   1. Only format, no style
+    //   2. No format, only style
+    //   3. Format different than the style
     //   4. Format different than the existing custom format of the style
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
-    outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
-    outputFields[0].setStyleCell( "H1" );
-    outputFields[0].setFormat( "" );
-    outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0" );
+    outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
+    outputFields[0].setStyleCell( "" );
+    outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
     outputFields[1].setStyleCell( "H1" );
-    outputFields[1].setFormat( "0.00" );
-    outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
-    outputFields[2].setStyleCell( "" );
-    outputFields[2].setFormat( "0.0000" );
+    outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0.00" );
+    outputFields[2].setStyleCell( "H1" );
     outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
     outputFields[3].setStyleCell( "I1" );
-    outputFields[3].setFormat( "0.0000" );
 
     stepMeta.setOutputFields( outputFields );
   }
