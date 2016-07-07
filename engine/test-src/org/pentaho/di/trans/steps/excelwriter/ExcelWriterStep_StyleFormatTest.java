@@ -227,7 +227,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
     // we avoid reading/writing Excel files, so ExcelWriterStep.prepareNextOutputFile() doesn't get executed
     // create Excel workbook object
-    stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
+    stepData.wb = stepMeta.getExtension().equalsIgnoreCase( "xlsx" ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
     stepData.file = null;
     stepData.clearStyleCache( numOfFields );
