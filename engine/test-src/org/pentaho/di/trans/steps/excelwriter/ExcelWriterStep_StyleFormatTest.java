@@ -124,44 +124,30 @@ public class ExcelWriterStep_StyleFormatTest {
     CellStyle cellStyle = cell.getCellStyle();
     DataFormat format = stepData.wb.createDataFormat();
 
-    // cell with no custom style
+    // first cell with no custom style
     assertFalse( cellStyle.getBorderRight() == baseCellStyle.getBorderRight() );
     assertFalse( cellStyle.getFillPattern() == baseCellStyle.getFillPattern()  );
-    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.0" );
 
     // cells data format, as specified in step meta
     cellStyle = xlsRow.getCell( 0 ).getCellStyle();
-    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
     cellStyle = xlsRow.getCell( 1 ).getCellStyle();
-    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "##0,000.0" );
+    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "##0,000.0" );
     cellStyle = xlsRow.getCell( 2 ).getCellStyle();
-    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
     cellStyle = xlsRow.getCell( 3 ).getCellStyle();
-    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
 
-    String msg = format.getFormat( cellStyle.getDataFormat() );
-    System.out.println( msg );
-    DataFormat format2  = stepData.wb.createDataFormat();
-    msg = format2.getFormat( cellStyle.getDataFormat() );
-    System.out.println( msg );
-    assertEquals( format, format2 );
+
 
     // all cells retain their style
     for ( int i = 1; i < stepData.inputRowMeta.size(); i++ ) {
       cell = xlsRow.getCell( i );
       cellStyle = cell.getCellStyle();
 
-      // assertEquals( cellStyle.getBorderRight(), baseCellStyle.getBorderRight() );
-      // assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern()  );
+      assertEquals( cellStyle.getBorderRight(), baseCellStyle.getBorderRight() );
+      assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern()  );
     }
-
-
-
-    FileOutputStream fileOut = new FileOutputStream("workbook." + fileType);
-    stepData.wb.write(fileOut);
-    fileOut.close();
-
-    // Cell cell = stepData.wb.getCe
   }
 
   private void createStepMeta( String fileType ) throws KettleException {
