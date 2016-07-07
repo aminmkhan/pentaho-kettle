@@ -264,21 +264,15 @@ public class ExcelWriterStep_StyleFormatTest {
     step.getInputRowSets().add( inputRowSet );
     step.setInputRowMeta( inputRowMeta );
     step.getOutputRowSets().add( inputRowSet );
-
-    // step = spy( step );
-    // // ignoring to avoid useless errors in log
-    // doNothing().when( step ).prepareNextOutputFile();
-    // TransMeta mockTransMeta = mock( TransMeta.class );
-    // Trans mockTrans = mock( Trans.class );
-    // when( step.getTransMeta() ).thenReturn( mockTransMeta );
-    // when( step.getTrans() ).thenReturn( mockTrans );
   }
 
   private ArrayList<Object[]> createRowData() throws Exception {
     ArrayList<Object[]> rows = new ArrayList<Object[]>();
-    Object[] row = new Object[] {new Long(1001001), new Double(2.34e-4), new BigDecimal(40120), new Double(504150)};
+    Object[] row = new Object[] { new Long( 1001001 ), new Double( 2.34e-4 ),
+      new BigDecimal( 40120 ), new Double( 504150 ) };
     rows.add(row);
-    row = new Object[] {new Long(123456), new Double(4.6789e10), new BigDecimal(111111e-2), new Double(12312300)};
+    row = new Object[] { new Long( 123456 ), new Double( 4.6789e10 ),
+      new BigDecimal( 123123e-2 ), new Double( 12312300 ) };
     rows.add(row);
     return rows;
   }
@@ -300,5 +294,4 @@ public class ExcelWriterStep_StyleFormatTest {
     }
     return rm;
   }
-
 }
