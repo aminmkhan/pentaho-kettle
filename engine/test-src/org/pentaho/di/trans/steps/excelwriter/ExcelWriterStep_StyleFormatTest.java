@@ -22,7 +22,10 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
-import org.apache.poi.ss.usermodel.Workbook;
+import java.util.ArrayList;
+import java.util.List;
+import java.math.BigDecimal;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -30,29 +33,18 @@ import org.apache.poi.ss.usermodel.DataFormat;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.pentaho.di.core.RowSet;
-import org.pentaho.di.core.row.ValueMetaAndData;
 import org.pentaho.di.core.row.value.ValueMetaBigNumber;
 import org.pentaho.di.core.row.value.ValueMetaInteger;
 import org.pentaho.di.core.row.value.ValueMetaNumber;
-import org.pentaho.di.core.vfs.KettleVFS;
-import org.pentaho.di.utils.TestUtils;
-import org.pentaho.di.core.exception.KettleException;
-import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.core.row.value.ValueMetaFactory;
 import org.pentaho.di.core.row.RowMeta;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.row.ValueMetaInterface;
-import org.pentaho.di.core.row.value.ValueMetaString;
-import org.pentaho.di.trans.Trans;
-import org.pentaho.di.trans.TransMeta;
+import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.logging.LoggingObjectInterface;
 import org.pentaho.di.trans.steps.mock.StepMockHelper;
-
-import java.io.OutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.math.BigDecimal;
 
 import org.junit.After;
 import org.junit.Before;
@@ -64,7 +56,6 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-
 
 /**
  * @author Amin Khan
@@ -147,7 +138,7 @@ public class ExcelWriterStep_StyleFormatTest {
     // Cell cell = stepData.wb.getCe
   }
 
-  private void createStepMeta( String fileType ) throws KettleException, IOException {
+  private void createStepMeta( String fileType ) throws KettleException {
     stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
 
