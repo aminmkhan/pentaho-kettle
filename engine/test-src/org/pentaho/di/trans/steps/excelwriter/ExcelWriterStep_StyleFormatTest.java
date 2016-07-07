@@ -125,6 +125,8 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepData( fileType );
     step.init( stepMeta, stepData );
 
+    // We do not run transformation or executing the whole step
+    // instead we just execute ExcelWriterStepData.writeNextLine() to write to Excel workbook object
     // Values are written in A2:D2 and A3:D3 rows
     List<Object[]> rows = createRowData();
     for ( int i = 0; i < rows.size(); i++ ) {
