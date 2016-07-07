@@ -58,6 +58,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 
+/**
+ * Tests for applying Format and Style from cell (from a template) when writing fields
+ */
 public class ExcelWriterStep_StyleFormatTest {
 
   private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
@@ -66,6 +69,9 @@ public class ExcelWriterStep_StyleFormatTest {
   private ExcelWriterStepData stepData;
 
   @Before
+  /**
+   * Get mock helper
+   */
   public void setUp() throws Exception {
     stepMockHelper =
       new StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData>(
@@ -79,6 +85,9 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   @After
+  /**
+   * Clean-up objects
+   */
   public void tearDown() {
     stepData.file = null;
     stepData.sheet = null;
@@ -90,7 +99,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   /**
-   *
+   * Test applying Format and Style from cell for XLS file format
    */
   public void testStyleFormatHssf() throws Exception {
     testStyleFormat( "xls" );
@@ -98,13 +107,14 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   /**
-   *
+   * Test applying Format and Style from cell for XLSX file format
    */
   public void testStyleFormatXssf() throws Exception {
     testStyleFormat( "xlsx" );
   }
 
   /**
+   * Test applying Format and Style from cell (from a template) when writing fields
    *
    * @param fileType
    * @throws Exception
@@ -152,6 +162,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
+   * Setup any meta information for Excel Writer step
    *
    * @param fileType
    * @throws KettleException
@@ -184,6 +195,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
+   * Setup the data necessary for Excel Writer step
    *
    * @param fileType
    * @throws KettleException
@@ -239,7 +251,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
-   * Creates ExcelWriterStep object and mocks some of its required data
+   * Create ExcelWriterStep object and mock some of its required data
    *
    * @param fileType
    * @throws Exception
@@ -265,7 +277,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
-   * Creates data rows that are exported by
+   * Create data rows that are passed to Excel Writer step
    *
    * @return
    * @throws Exception
@@ -282,6 +294,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
+   * Create meta information for rows that are passed to Excel Writer step
    *
    * @return
    * @throws KettleException
