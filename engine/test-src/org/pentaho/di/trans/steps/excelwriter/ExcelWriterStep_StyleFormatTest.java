@@ -22,6 +22,7 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigDecimal;
@@ -95,7 +96,7 @@ public class ExcelWriterStep_StyleFormatTest {
     testStyleFormat( "xls" );
   }
 
-  //@Test
+  @Test
   public void testStyleFormatXssf() throws Exception {
     testStyleFormat( "xlsx" );
   }
@@ -106,13 +107,15 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepData( fileType );
     step.init( stepMeta, stepData );
 
+    // Values is written in A2:D2 and A3:D3 rows
     List<Object[]> rows = createRowData();
     for ( int i = 0; i < rows.size(); i++ ) {
       step.writeNextLine( rows.get(i) );
     }
 
+    // Custom styles are loaded from F1 and G1 cells
     Row xlsRow = stepData.sheet.getRow( 0 );
-    Cell baseCell = xlsRow.getCell( 9 );
+    Cell baseCell = xlsRow.getCell( 6 );
     CellStyle baseCellStyle = baseCell.getCellStyle();
 
     // get style of the written cell
@@ -125,6 +128,16 @@ public class ExcelWriterStep_StyleFormatTest {
     assertFalse( cellStyle.getBorderRight() == baseCellStyle.getBorderRight() );
     assertFalse( cellStyle.getFillPattern() == baseCellStyle.getFillPattern()  );
     // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.0" );
+
+    // cells data format, as specified in step meta
+    cellStyle = xlsRow.getCell( 0 ).getCellStyle();
+    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    cellStyle = xlsRow.getCell( 1 ).getCellStyle();
+    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "##0,000.0" );
+    cellStyle = xlsRow.getCell( 2 ).getCellStyle();
+    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    cellStyle = xlsRow.getCell( 3 ).getCellStyle();
+    // assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
 
     String msg = format.getFormat( cellStyle.getDataFormat() );
     System.out.println( msg );
@@ -142,10 +155,11 @@ public class ExcelWriterStep_StyleFormatTest {
       // assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern()  );
     }
 
-    // cells data format
-    cell = xlsRow.getCell( 1 );
-    cellStyle = cell.getCellStyle();
-    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.0" );
+
+
+    FileOutputStream fileOut = new FileOutputStream("workbook." + fileType);
+    stepData.wb.write(fileOut);
+    fileOut.close();
 
     // Cell cell = stepData.wb.getCe
   }
@@ -162,7 +176,7 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setStartingCell( "A2" );
 
     stepMeta.setTemplateEnabled( false );
-    stepMeta.setTemplateFileName( "testExcelStyle." + fileType );
+    stepMeta.setTemplateFileName( "" );
     stepMeta.setTemplateSheetName( "Sheet1" );
 
     // Try different combinations of specifying data format and style from cell
@@ -171,14 +185,14 @@ public class ExcelWriterStep_StyleFormatTest {
     //   3. Format different than the style
     //   4. Format different than the existing custom format of the style
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
-    outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0" );
+    outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.00000" );
     outputFields[0].setStyleCell( "" );
     outputFields[1] = new ExcelWriterStepField( "col 2", ValueMetaFactory.getIdForValueMeta( "Number" ), "" );
-    outputFields[1].setStyleCell( "H1" );
-    outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0.00" );
-    outputFields[2].setStyleCell( "H1" );
-    outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.0000" );
-    outputFields[3].setStyleCell( "I1" );
+    outputFields[1].setStyleCell( "G1" );
+    outputFields[2] = new ExcelWriterStepField( "col 3", ValueMetaFactory.getIdForValueMeta( "BigNumber" ), "0.00000" );
+    outputFields[2].setStyleCell( "F1" );
+    outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.00000" );
+    outputFields[3].setStyleCell( "G1" );
 
     stepMeta.setOutputFields( outputFields );
   }
@@ -215,16 +229,19 @@ public class ExcelWriterStep_StyleFormatTest {
     DataFormat format = stepData.wb.createDataFormat();
     Row xlsRow = stepData.sheet.createRow( 0 );
 
-    Cell cell = xlsRow.createCell( 8 );
-    cellStyle.setBorderRight( CellStyle.BORDER_THIN );
-    cellStyle.setFillPattern( CellStyle.BIG_SPOTS );
+    // Cell F1 has custom style applied, used as template
+    Cell cell = xlsRow.createCell( 5 );
+    cellStyle = stepData.wb.createCellStyle();
+    cellStyle.setBorderRight( CellStyle.BORDER_THICK );
+    cellStyle.setFillPattern( CellStyle.FINE_DOTS );
     cell.setCellStyle( cellStyle );
 
-    cell = xlsRow.createCell( 9 );
+    // Cell G1 has same style. and also a custom format
+    cell = xlsRow.createCell( 6 );
     cellStyle = stepData.wb.createCellStyle();
-    cellStyle.setBorderRight( CellStyle.BORDER_THIN );
-    cellStyle.setFillPattern( CellStyle.BIG_SPOTS );
-    cellStyle.setDataFormat( format.getFormat( "0.0" ) );
+    cellStyle.setBorderRight( CellStyle.BORDER_THICK );
+    cellStyle.setFillPattern( CellStyle.FINE_DOTS );
+    cellStyle.setDataFormat( format.getFormat( "##0,000.0" ) );
     cell.setCellStyle( cellStyle );
   }
 
@@ -253,9 +270,9 @@ public class ExcelWriterStep_StyleFormatTest {
     Object[] row = new Object[] { new Long( 123456 ), new Double( 2.34e-4 ),
       new BigDecimal( "123456789.987654321" ), new Double( 504150 ) };
     rows.add(row);
-//    row = new Object[] { new Long( 1001001 ), new Double( 4.6789e10 ),
-//      new BigDecimal( 123123e-2 ), new Double( 12312300 ) };
-//    rows.add(row);
+    row = new Object[] { new Long( 1001001 ), new Double( 4.6789e10 ),
+      new BigDecimal( 123123e-2 ), new Double( 12312300 ) };
+    rows.add(row);
     return rows;
   }
 
