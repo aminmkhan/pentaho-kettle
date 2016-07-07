@@ -89,15 +89,26 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   @Test
+  /**
+   *
+   */
   public void testStyleFormatHssf() throws Exception {
     testStyleFormat( "xls" );
   }
 
   @Test
+  /**
+   *
+   */
   public void testStyleFormatXssf() throws Exception {
     testStyleFormat( "xlsx" );
   }
 
+  /**
+   *
+   * @param fileType
+   * @throws Exception
+   */
   private void testStyleFormat( String fileType ) throws Exception {
     setupStepMock( fileType );
     createStepMeta( fileType );
@@ -114,45 +125,37 @@ public class ExcelWriterStep_StyleFormatTest {
     Row xlsRow = stepData.sheet.getRow( 0 );
     Cell baseCell = xlsRow.getCell( 6 );
     CellStyle baseCellStyle = baseCell.getCellStyle();
+    DataFormat format = stepData.wb.createDataFormat();
 
     // Check style of the exported values in A3:D3
     xlsRow = stepData.sheet.getRow( 2 );
-    Cell cell = xlsRow.getCell( 0 );
-    CellStyle cellStyle = cell.getCellStyle();
-    DataFormat format = stepData.wb.createDataFormat();
-
-    // first cell has no custom style
-    short border = cellStyle.getBorderRight();
-    short fill = cellStyle.getFillPattern();
-    assertFalse( border == baseCellStyle.getBorderRight() );
-    assertFalse( fill == baseCellStyle.getFillPattern() );
-
-    // cells data format, as specified in step meta
-    cellStyle = xlsRow.getCell( 0 ).getCellStyle();
-    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
-    cellStyle = xlsRow.getCell( 1 ).getCellStyle();
-    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "##0,000.0" );
-    cellStyle = xlsRow.getCell( 2 ).getCellStyle();
-    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
-    cellStyle = xlsRow.getCell( 3 ).getCellStyle();
-    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
-
-    // cells retain their style, and format
     for ( int i = 0; i < stepData.inputRowMeta.size(); i++ ) {
-      cell = xlsRow.getCell( i );
-      cellStyle = cell.getCellStyle();
+      Cell cell = xlsRow.getCell( i );
+      CellStyle cellStyle = cell.getCellStyle();
 
       if ( i > 0 ) {
         assertEquals( cellStyle.getBorderRight(), baseCellStyle.getBorderRight() );
         assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern() );
       } else {
-        assertFalse( border == baseCellStyle.getBorderRight() );
-        assertFalse( fill == baseCellStyle.getFillPattern() );
+        // cell A2/A3 has no custom style
+        assertFalse( cellStyle.getBorderRight() == baseCellStyle.getBorderRight() );
+        assertFalse( cellStyle.getFillPattern() == baseCellStyle.getFillPattern() );
       }
 
+      if ( i != 1 ) {
+        assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
+      } else {
+        // cell B2/B3 use different format from the custom style
+        assertEquals( format.getFormat( cellStyle.getDataFormat() ), "##0,000.0" );
+      }
     }
   }
 
+  /**
+   *
+   * @param fileType
+   * @throws KettleException
+   */
   private void createStepMeta( String fileType ) throws KettleException {
     stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
@@ -181,6 +184,11 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta.setOutputFields( outputFields );
   }
 
+  /**
+   *
+   * @param fileType
+   * @throws KettleException
+   */
   private void createStepData( String fileType ) throws KettleException {
     stepData = new ExcelWriterStepData();
     stepData.inputRowMeta = step.getInputRowMeta().clone();
@@ -227,6 +235,11 @@ public class ExcelWriterStep_StyleFormatTest {
     cell.setCellStyle( cellStyle );
   }
 
+  /**
+   *
+   * @param fileType
+   * @throws Exception
+   */
   private void setupStepMock( String fileType ) throws Exception {
     step =
       new ExcelWriterStep(
@@ -247,6 +260,11 @@ public class ExcelWriterStep_StyleFormatTest {
     step.getOutputRowSets().add( inputRowSet );
   }
 
+  /**
+   *
+   * @return
+   * @throws Exception
+   */
   private ArrayList<Object[]> createRowData() throws Exception {
     ArrayList<Object[]> rows = new ArrayList<Object[]>();
     Object[] row = new Object[] { new Long( 123456 ), new Double( 2.34e-4 ),
@@ -258,6 +276,11 @@ public class ExcelWriterStep_StyleFormatTest {
     return rows;
   }
 
+  /**
+   * 
+   * @return
+   * @throws KettleException
+   */
   private RowMetaInterface createRowMeta() throws KettleException {
     RowMetaInterface rm = new RowMeta();
     try {
