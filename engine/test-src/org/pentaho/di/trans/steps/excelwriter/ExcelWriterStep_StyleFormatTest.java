@@ -101,7 +101,15 @@ public class ExcelWriterStep_StyleFormatTest {
 
   @Test
   public void testStyleFormatHssf() throws Exception {
-    String fileType = "xls";
+    testStyleFormat( "xls" );
+  }
+
+  @Test
+  public void testStyleFormatXssf() throws Exception {
+    testStyleFormat( "xlsx" );
+  }
+
+  private void testStyleFormat( String fileType ) throws Exception {
     setupStepMock( fileType );
     createStepMeta( fileType );
     createStepData( fileType );
@@ -115,7 +123,6 @@ public class ExcelWriterStep_StyleFormatTest {
     Row xlsRow = stepData.sheet.getRow( 0 );
     Cell baseCell = xlsRow.getCell( 8 );
     CellStyle baseCellStyle = baseCell.getCellStyle();
-
 
     // get style of the written cell
     xlsRow = stepData.sheet.getRow( 1 );
@@ -138,33 +145,6 @@ public class ExcelWriterStep_StyleFormatTest {
     }
 
     // Cell cell = stepData.wb.getCe
-  }
-
-  // @Test
-  public void testStyleFormatXssf() throws Exception {
-    // TODO Test for both xls and xlsx
-    String fileType = "xlsx";
-    setupStepMock( fileType );
-    createStepMeta( fileType );
-    createStepData( fileType );
-  }
-
-  // @Test
-  public void testStyleFormatNoTemplate() throws Exception {
-    createStepMeta( "xlsx" );
-    createStepData( "xlsx" );
-
-    stepMeta.setTemplateEnabled( false );
-    stepMeta.setTemplateFileName( "" );
-
-    // step.prepareNextOutputFile();
-
-    // List<RowMetaAndData> list = createRowData();
-
-
-
-    // Tests
-
   }
 
   private void createStepMeta( String fileType ) throws KettleException, IOException {
@@ -210,7 +190,6 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.startingCol = cellRef.getCol();
     stepData.posX = stepData.startingCol;
     stepData.posY = stepData.startingRow ;
-
 
     int numOfFields = stepData.inputRowMeta.size();
     stepData.fieldnrs = new int[numOfFields];
