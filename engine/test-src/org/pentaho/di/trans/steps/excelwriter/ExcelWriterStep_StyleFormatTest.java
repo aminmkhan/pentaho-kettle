@@ -106,7 +106,7 @@ public class ExcelWriterStep_StyleFormatTest {
     createStepData( fileType );
     step.init( stepMeta, stepData );
 
-    // Values is written in A2:D2 and A3:D3 rows
+    // Values are written in A2:D2 and A3:D3 rows
     List<Object[]> rows = createRowData();
     for ( int i = 0; i < rows.size(); i++ ) {
       step.writeNextLine( rows.get( i ) );
@@ -153,16 +153,11 @@ public class ExcelWriterStep_StyleFormatTest {
     stepMeta = new ExcelWriterStepMeta();
     stepMeta.setDefault();
 
-    String path = "testExcel" + "." + fileType;
-    stepMeta.setFileName( path.replace( "." + fileType, "" ) );
+    stepMeta.setFileName( "testExcel" );
     stepMeta.setExtension( fileType );
     stepMeta.setSheetname( "Sheet1" );
     stepMeta.setHeaderEnabled( true );
     stepMeta.setStartingCell( "A2" );
-
-    stepMeta.setTemplateEnabled( false );
-    stepMeta.setTemplateFileName( "" );
-    stepMeta.setTemplateSheetName( "Sheet1" );
 
     // Try different combinations of specifying data format and style from cell
     //   1. Only format, no style
@@ -210,22 +205,20 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.clearStyleCache( numOfFields );
 
     // set cells with custom style and formatting
-    CellStyle cellStyle = stepData.wb.createCellStyle();
     DataFormat format = stepData.wb.createDataFormat();
     Row xlsRow = stepData.sheet.createRow( 0 );
 
     // Cell F1 has custom style applied, used as template
     Cell cell = xlsRow.createCell( 5 );
-    cellStyle = stepData.wb.createCellStyle();
+    CellStyle cellStyle = stepData.wb.createCellStyle();
     cellStyle.setBorderRight( CellStyle.BORDER_THICK );
     cellStyle.setFillPattern( CellStyle.FINE_DOTS );
     cell.setCellStyle( cellStyle );
 
-    // Cell G1 has same style. and also a custom format
-    cell = xlsRow.createCell( 6 );
+    // Cell G1 has same style, but also a custom data format
     cellStyle = stepData.wb.createCellStyle();
-    cellStyle.setBorderRight( CellStyle.BORDER_THICK );
-    cellStyle.setFillPattern( CellStyle.FINE_DOTS );
+    cellStyle.cloneStyleFrom( cell.getCellStyle() );
+    cell = xlsRow.createCell( 6 );
     cellStyle.setDataFormat( format.getFormat( "##0,000.0" ) );
     cell.setCellStyle( cellStyle );
   }
