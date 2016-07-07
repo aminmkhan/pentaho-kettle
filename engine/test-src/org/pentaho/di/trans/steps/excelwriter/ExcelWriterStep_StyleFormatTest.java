@@ -169,8 +169,8 @@ public class ExcelWriterStep_StyleFormatTest {
     // Try different combinations of specifying data format and style from cell
     //   1. Only format, no style
     //   2. No format, only style
-    //   3. Format different than the style
-    //   4. Format different than the existing custom format of the style
+    //   3. Format, and a different style without a format defined
+    //   4. Format, and a different style with a different format defined but gets overridden
     ExcelWriterStepField[] outputFields = new ExcelWriterStepField[4];
     outputFields[0] = new ExcelWriterStepField( "col 1", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.00000" );
     outputFields[0].setStyleCell( "" );
@@ -180,7 +180,6 @@ public class ExcelWriterStep_StyleFormatTest {
     outputFields[2].setStyleCell( "F1" );
     outputFields[3] = new ExcelWriterStepField( "col 4", ValueMetaFactory.getIdForValueMeta( "Integer" ), "0.00000" );
     outputFields[3].setStyleCell( "G1" );
-
     stepMeta.setOutputFields( outputFields );
   }
 
@@ -194,6 +193,8 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.inputRowMeta = step.getInputRowMeta().clone();
     stepData.outputRowMeta = step.getInputRowMeta().clone();
 
+    // we don't run transformation so ExcelWriterStep.processRow() doesn't get executed
+    // we populate the ExcelWriterStepData with bare minimum required values
     CellReference cellRef = new CellReference( stepMeta.getStartingCell() );
     stepData.startingRow = cellRef.getRow();
     stepData.startingCol = cellRef.getCol();
@@ -210,13 +211,15 @@ public class ExcelWriterStep_StyleFormatTest {
       stepData.commentfieldnrs[i] = -1;
     }
 
-    // create Excel workbook
+    // we avoid reading/writing Excel files, so ExcelWriterStep.prepareNextOutputFile() doesn't get executed
+    // create Excel workbook object
     stepData.wb = stepMeta.getExtension().equalsIgnoreCase( fileType ) ? new XSSFWorkbook() : new HSSFWorkbook();
     stepData.sheet = stepData.wb.createSheet();
     stepData.file = null;
     stepData.clearStyleCache( numOfFields );
 
-    // set cells with custom style and formatting
+    // we avoid reading template file from disk
+    // so set beforehand cells with custom style and formatting
     DataFormat format = stepData.wb.createDataFormat();
     Row xlsRow = stepData.sheet.createRow( 0 );
 
@@ -236,6 +239,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
+   * Creates ExcelWriterStep object and mocks some of its required data
    *
    * @param fileType
    * @throws Exception
@@ -261,6 +265,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
+   * Creates data rows that are exported by
    *
    * @return
    * @throws Exception
@@ -277,7 +282,7 @@ public class ExcelWriterStep_StyleFormatTest {
   }
 
   /**
-   * 
+   *
    * @return
    * @throws KettleException
    */
