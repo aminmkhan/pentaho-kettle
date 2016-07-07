@@ -22,7 +22,6 @@
 
 package org.pentaho.di.trans.steps.excelwriter;
 
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.math.BigDecimal;
@@ -110,7 +109,7 @@ public class ExcelWriterStep_StyleFormatTest {
     // Values is written in A2:D2 and A3:D3 rows
     List<Object[]> rows = createRowData();
     for ( int i = 0; i < rows.size(); i++ ) {
-      step.writeNextLine( rows.get(i) );
+      step.writeNextLine( rows.get( i ) );
     }
 
     // Custom styles are loaded from F1 and G1 cells
@@ -130,7 +129,7 @@ public class ExcelWriterStep_StyleFormatTest {
 
     // cells data format, as specified in step meta
     cellStyle = xlsRow.getCell( 0 ).getCellStyle();
-    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
     cellStyle = xlsRow.getCell( 1 ).getCellStyle();
     assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "##0,000.0" );
     cellStyle = xlsRow.getCell( 2 ).getCellStyle();
@@ -192,7 +191,7 @@ public class ExcelWriterStep_StyleFormatTest {
     stepData.startingRow = cellRef.getRow();
     stepData.startingCol = cellRef.getCol();
     stepData.posX = stepData.startingCol;
-    stepData.posY = stepData.startingRow ;
+    stepData.posY = stepData.startingRow;
 
     int numOfFields = stepData.inputRowMeta.size();
     stepData.fieldnrs = new int[numOfFields];
@@ -255,14 +254,14 @@ public class ExcelWriterStep_StyleFormatTest {
     ArrayList<Object[]> rows = new ArrayList<Object[]>();
     Object[] row = new Object[] { new Long( 123456 ), new Double( 2.34e-4 ),
       new BigDecimal( "123456789.987654321" ), new Double( 504150 ) };
-    rows.add(row);
+    rows.add( row );
     row = new Object[] { new Long( 1001001 ), new Double( 4.6789e10 ),
       new BigDecimal( 123123e-2 ), new Double( 12312300 ) };
-    rows.add(row);
+    rows.add( row );
     return rows;
   }
 
-  private RowMetaInterface createRowMeta() throws KettleException{
+  private RowMetaInterface createRowMeta() throws KettleException {
     RowMetaInterface rm = new RowMeta();
     try {
       ValueMetaInterface[] valuesMeta = {
