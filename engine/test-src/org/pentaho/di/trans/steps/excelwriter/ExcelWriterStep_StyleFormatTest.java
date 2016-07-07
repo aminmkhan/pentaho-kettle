@@ -57,9 +57,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-/**
- * @author Amin Khan
- */
+
 public class ExcelWriterStep_StyleFormatTest {
 
   private StepMockHelper<ExcelWriterStepMeta, ExcelWriterStepData> stepMockHelper;
@@ -112,40 +110,46 @@ public class ExcelWriterStep_StyleFormatTest {
       step.writeNextLine( rows.get( i ) );
     }
 
-    // Custom styles are loaded from F1 and G1 cells
+    // Custom styles are loaded from G1 cell
     Row xlsRow = stepData.sheet.getRow( 0 );
     Cell baseCell = xlsRow.getCell( 6 );
     CellStyle baseCellStyle = baseCell.getCellStyle();
 
-    // get style of the written cell
-    xlsRow = stepData.sheet.getRow( 1 );
+    // Check style of the exported values in A3:D3
+    xlsRow = stepData.sheet.getRow( 2 );
     Cell cell = xlsRow.getCell( 0 );
     CellStyle cellStyle = cell.getCellStyle();
     DataFormat format = stepData.wb.createDataFormat();
 
-    // first cell with no custom style
-    assertFalse( cellStyle.getBorderRight() == baseCellStyle.getBorderRight() );
-    assertFalse( cellStyle.getFillPattern() == baseCellStyle.getFillPattern()  );
+    // first cell has no custom style
+    short border = cellStyle.getBorderRight();
+    short fill = cellStyle.getFillPattern();
+    assertFalse( border == baseCellStyle.getBorderRight() );
+    assertFalse( fill == baseCellStyle.getFillPattern() );
 
     // cells data format, as specified in step meta
     cellStyle = xlsRow.getCell( 0 ).getCellStyle();
     assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
     cellStyle = xlsRow.getCell( 1 ).getCellStyle();
-    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "##0,000.0" );
+    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "##0,000.0" );
     cellStyle = xlsRow.getCell( 2 ).getCellStyle();
-    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
     cellStyle = xlsRow.getCell( 3 ).getCellStyle();
-    assertTrue( format.getFormat( cellStyle.getDataFormat() ) == "0.00000" );
+    assertEquals( format.getFormat( cellStyle.getDataFormat() ), "0.00000" );
 
-
-
-    // all cells retain their style
-    for ( int i = 1; i < stepData.inputRowMeta.size(); i++ ) {
+    // cells retain their style, and format
+    for ( int i = 0; i < stepData.inputRowMeta.size(); i++ ) {
       cell = xlsRow.getCell( i );
       cellStyle = cell.getCellStyle();
 
-      assertEquals( cellStyle.getBorderRight(), baseCellStyle.getBorderRight() );
-      assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern()  );
+      if ( i > 0 ) {
+        assertEquals( cellStyle.getBorderRight(), baseCellStyle.getBorderRight() );
+        assertEquals( cellStyle.getFillPattern(), baseCellStyle.getFillPattern() );
+      } else {
+        assertFalse( border == baseCellStyle.getBorderRight() );
+        assertFalse( fill == baseCellStyle.getFillPattern() );
+      }
+
     }
   }
 
