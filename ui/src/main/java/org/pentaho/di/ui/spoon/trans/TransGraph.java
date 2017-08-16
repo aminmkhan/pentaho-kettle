@@ -113,6 +113,7 @@ import org.pentaho.di.core.plugins.PluginRegistry;
 import org.pentaho.di.core.plugins.StepPluginType;
 import org.pentaho.di.core.row.RowMetaInterface;
 import org.pentaho.di.core.util.Utils;
+import org.pentaho.di.core.variables.Variables;
 import org.pentaho.di.engine.api.Engine;
 import org.pentaho.di.i18n.BaseMessages;
 import org.pentaho.di.job.Job;
@@ -5017,15 +5018,25 @@ public class TransGraph extends AbstractGraph implements XulEventHandler, Redraw
       return createLegacyTrans();
     }
 
-    return PluginRegistry.getInstance().getPlugins( EnginePluginType.class ).stream()
-      .filter( useThisEngine() )
-      .findFirst()
-      .map( plugin -> (Engine) loadPlugin( plugin ) )
-      .map( engine -> {
-        log.logBasic( "Using execution engine " + engine.getClass().getCanonicalName() );
-        return (Trans) new TransEngineAdapter( engine, transMeta );
-      } )
-      .orElseThrow( () -> new KettleException( "Unable to find engine [" + transMeta.getVariable( "engine" ) + "]" ) );
+    Variables variables = new Variables();
+    variables.initializeVariablesFrom( null );
+    // For now, by default use RSA for communication with daemon (v 1.0), later WebSockets (v 2.0)
+    String version = variables.getVariable( "KETTLE_AEL_PDI_DAEMON_VERSION", "1.0" );
+    if ( Const.toDouble( version, 1 ) >= 2 ) {
+      // Use WebSockets to connect to PDI Daemon
+      throw new KettleException( "Unable to find engine [" + transMeta.getVariable( "engine" ) + "]" );
+    } else {
+      return PluginRegistry.getInstance().getPlugins( EnginePluginType.class ).stream()
+        .filter( useThisEngine() )
+        .findFirst()
+        .map( plugin -> (Engine) loadPlugin( plugin ) )
+        .map( engine -> {
+          log.logBasic( "Using execution engine " + engine.getClass().getCanonicalName() );
+          return (Trans) new TransEngineAdapter( engine, transMeta );
+        } )
+        .orElseThrow( () -> new KettleException(
+          "Unable to find engine [" + transMeta.getVariable( "engine" ) + "]" ) );
+    }
   }
 
   /**
